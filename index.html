@@ -26,13 +26,14 @@
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
 
-  /* ---- Flashcard flip ---- */
+  /* ---------- Flashcard flip ---------- */
+  .flip-scene { perspective: 1200px; }
   .flip-inner {
     display: grid;
     transform-style: preserve-3d;
-    transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+    transition: transform .55s cubic-bezier(.4, 0, .2, 1);
   }
-  .flip-inner.is-flipped { transform: rotateY(180deg); }
+  .flip-inner.flipped { transform: rotateY(180deg); }
   .flip-face {
     grid-area: 1 / 1;
     backface-visibility: hidden;
@@ -50,10 +51,10 @@
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useRef, useCallback } = React;
+const { useState, useEffect, useMemo, useCallback } = React;
 
 /* ============================================================
-   1. VOCABULARY DATA
+   VOCABULARY DATA
    Format: [word, ipa, partOfSpeech, englishDefinition,
             vietnameseMeaning, exampleSentence, vietnameseExample, topic]
    ============================================================ */
@@ -252,55 +253,50 @@ const RAW = [
 ["sustain","/səˈsteɪn/","verb","to be used at a level that won't damage the environment","duy trì, chống đỡ","We must sustain the ecosystem.","Chúng ta phải duy trì hệ sinh thái.","Environment"]
 ];
 
-/* ---- Build stable word objects with unique ids ---- */
+/* ---------- Build stable ids ---------- */
 const _idCount = {};
 const WORDS = RAW.map((r, i) => {
   const [word, ipa, pos, en, vi, ex, exVi, topic] = r;
-  const base = word.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') + '-' + pos;
+  const base = word.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-" + pos;
   _idCount[base] = (_idCount[base] || 0) + 1;
-  const id = _idCount[base] > 1 ? base + '-' + _idCount[base] : base;
+  const id = _idCount[base] > 1 ? base + "-" + _idCount[base] : base;
   return { id, word, ipa, pos, en, vi, ex, exVi, topic, index: i };
 });
 const WORD_BY_ID = Object.fromEntries(WORDS.map(w => [w.id, w]));
 
-const POS_LIST = ['All', 'Noun', 'Verb', 'Adjective', 'Adverb', 'Phrase'];
-const TOPICS = ['Academic','Travel','Entertainment','Art','Sports','Health','Environment','Music','Business','Food','Media','Society'];
-const POS_LABEL = { adjective: 'ADJECTIVE', noun: 'NOUN', verb: 'VERB', adverb: 'ADVERB', phrase: 'PHRASE' };
+const POS_LIST = ["All", "Noun", "Verb", "Adjective", "Adverb", "Phrase"];
+const TOPICS = ["Academic","Travel","Entertainment","Art","Sports","Health","Environment","Music","Business","Food","Media","Society"];
+const POS_LABEL = { adjective: "ADJECTIVE", noun: "NOUN", verb: "VERB", adverb: "ADVERB", phrase: "PHRASE" };
 
 /* ============================================================
-   2. UTILITIES
+   UTILITIES
    ============================================================ */
 const DAY = 86400000;
-const STORAGE_KEY = 'vocabviet.v1';
+const STORAGE_KEY = "vocabviet.v2";
 const SESSION_SIZE = 20;
 const DAILY_GOAL = 20;
-
-// step -> interval in days
 const INTERVALS = [0, 1, 3, 7, 14, 30, 60];
 
 function dateKey(d = new Date()) {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${dd}`;
 }
-
 function endOfToday() {
   const d = new Date();
   d.setHours(23, 59, 59, 999);
   return d.getTime();
 }
-
 function normalize(s) {
-  return (s || '')
+  return (s || "")
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd');
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d");
 }
-
 function shuffle(arr) {
-  const a = [...arr];
+  const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
@@ -308,48 +304,47 @@ function shuffle(arr) {
   return a;
 }
 
-/* ---- Text to speech (en-GB preferred) ---- */
+/* ---------- Speech synthesis ---------- */
 let _voiceCache = null;
 function pickEnglishVoice() {
-  if (!('speechSynthesis' in window)) return null;
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
   const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
+  if (!voices || !voices.length) return null;
   return (
-    voices.find(v => v.lang === 'en-GB') ||
-    voices.find(v => (v.lang || '').startsWith('en-GB')) ||
-    voices.find(v => (v.lang || '').startsWith('en')) ||
+    voices.find(v => v.lang === "en-GB") ||
+    voices.find(v => (v.lang || "").startsWith("en-GB")) ||
+    voices.find(v => (v.lang || "").startsWith("en")) ||
     null
   );
 }
 function speak(text) {
-  if (!('speechSynthesis' in window)) return;
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   try {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-GB';
+    u.lang = "en-GB";
     u.rate = 0.9;
-    u.pitch = 1;
     const v = _voiceCache || pickEnglishVoice();
     if (v) { u.voice = v; _voiceCache = v; }
     window.speechSynthesis.speak(u);
-  } catch (e) { /* silent */ }
+  } catch (e) { /* ignore */ }
 }
-if ('speechSynthesis' in window) {
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
   window.speechSynthesis.onvoiceschanged = () => { _voiceCache = pickEnglishVoice(); };
   setTimeout(() => { _voiceCache = pickEnglishVoice(); }, 300);
 }
 
 /* ============================================================
-   3. STORAGE
+   STORAGE
    ============================================================ */
 const DEFAULT_STORE = {
-  cards: {},          // id -> { step, reviewCount, correctCount, incorrectCount, lastReviewed, nextReview, level }
-  favorites: [],      // [id]
-  mistakes: [],       // [id]
-  activity: {},       // 'YYYY-MM-DD' -> count
+  cards: {},
+  favorites: [],
+  mistakes: [],
+  activity: {},
   streak: { count: 0, last: null },
   stats: { practiceCorrect: 0, practiceTotal: 0 },
-  settings: { direction: 'en-vi' }
+  settings: { direction: "en-vi" }
 };
 
 function loadStore() {
@@ -361,8 +356,8 @@ function loadStore() {
       ...DEFAULT_STORE,
       ...p,
       cards: p.cards || {},
-      favorites: p.favorites || [],
-      mistakes: p.mistakes || [],
+      favorites: Array.isArray(p.favorites) ? p.favorites : [],
+      mistakes: Array.isArray(p.mistakes) ? p.mistakes : [],
       activity: p.activity || {},
       streak: p.streak || { count: 0, last: null },
       stats: p.stats || { practiceCorrect: 0, practiceTotal: 0 },
@@ -372,33 +367,24 @@ function loadStore() {
     return JSON.parse(JSON.stringify(DEFAULT_STORE));
   }
 }
-
 function saveStore(store) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); } catch (e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); } catch (e) { /* ignore */ }
 }
 
 /* ============================================================
-   4. SPACED REPETITION
+   SPACED REPETITION
    ============================================================ */
 function isNewCard(card) {
   return !card || !card.lastReviewed;
 }
-
-function isDue(card, now = Date.now()) {
-  if (!card || !card.lastReviewed) return false;
-  if (!card.nextReview) return false;
-  return card.nextReview <= now;
-}
-
 function dueToday(card) {
   if (!card || !card.lastReviewed || !card.nextReview) return false;
   return card.nextReview <= endOfToday();
 }
-
 function applyRating(prevCard, rating) {
   const c = prevCard || {
     step: 0, reviewCount: 0, correctCount: 0, incorrectCount: 0,
-    lastReviewed: null, nextReview: null, level: 'new'
+    lastReviewed: null, nextReview: null, level: "new"
   };
   let step = c.step || 0;
   let correct = c.correctCount || 0;
@@ -406,21 +392,21 @@ function applyRating(prevCard, rating) {
   const now = Date.now();
   let next;
 
-  if (rating === 'again') {
+  if (rating === "again") {
     step = 0;
     incorrect += 1;
-    next = now + 10 * 60 * 1000;           // come back in ~10 minutes
-  } else if (rating === 'good') {
+    next = now + 10 * 60 * 1000;
+  } else if (rating === "good") {
     step = Math.min(step + 1, INTERVALS.length - 1);
     correct += 1;
     next = now + INTERVALS[step] * DAY;
-  } else {                                  // easy
+  } else { // easy
     step = Math.min(step + 2, INTERVALS.length - 1);
     correct += 1;
     next = now + INTERVALS[step] * DAY;
   }
 
-  const level = step >= 4 ? 'mastered' : 'learning';
+  const level = step >= 4 ? "mastered" : "learning";
   return {
     step, level,
     reviewCount: (c.reviewCount || 0) + 1,
@@ -432,29 +418,29 @@ function applyRating(prevCard, rating) {
 }
 
 /* ============================================================
-   5. SHARED UI PRIMITIVES
+   UI PRIMITIVES
    ============================================================ */
-function ProgressBar({ value, max, className = '', color = 'bg-indigo-600' }) {
+function ProgressBar({ value, max, className = "", color = "bg-indigo-600" }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
     <div className={`h-2 w-full rounded-full bg-slate-100 overflow-hidden ${className}`}>
-      <div className={`h-full rounded-full ${color} transition-all duration-500`} style={{ width: pct + '%' }} />
+      <div className={`h-full rounded-full ${color} transition-all duration-500`} style={{ width: pct + "%" }} />
     </div>
   );
 }
 
-function Segmented({ options, value, onChange, className = '' }) {
+function Segmented({ options, value, onChange, className = "" }) {
   return (
     <div className={`inline-flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1 ${className}`}>
       {options.map(o => (
         <button
-          key={o.value}
+          key={String(o.value)}
           type="button"
           onClick={() => onChange(o.value)}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors no-tap-highlight ${
             value === o.value
-              ? 'bg-white text-indigo-700 shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
+              ? "bg-white text-indigo-700 shadow-sm"
+              : "text-slate-600 hover:text-slate-900"
           }`}
         >
           {o.label}
@@ -464,7 +450,7 @@ function Segmented({ options, value, onChange, className = '' }) {
   );
 }
 
-function AudioButton({ text, variant = 'icon' }) {
+function AudioButton({ text, variant = "icon" }) {
   const [active, setActive] = useState(false);
   const handle = (e) => {
     e.stopPropagation();
@@ -473,15 +459,15 @@ function AudioButton({ text, variant = 'icon' }) {
     speak(text);
     setTimeout(() => setActive(false), 900);
   };
-  if (variant === 'full') {
+  if (variant === "full") {
     return (
       <button
         type="button"
         onClick={handle}
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition no-tap-highlight
           ${active
-            ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
-            : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-700'}`}
+            ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+            : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-700"}`}
       >
         <span>🔊</span> Listen
       </button>
@@ -492,10 +478,10 @@ function AudioButton({ text, variant = 'icon' }) {
       type="button"
       aria-label="Listen"
       onClick={handle}
-      className={`w-9 h-9 shrink-0 grid place-items-center rounded-full border text-[15px] transition
+      className={`w-9 h-9 shrink-0 grid place-items-center rounded-full border text-[15px] transition no-tap-highlight
         ${active
-          ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
-          : 'border-slate-200 bg-white text-slate-500 hover:text-indigo-600 hover:border-indigo-200'}`}
+          ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+          : "border-slate-200 bg-white text-slate-500 hover:text-indigo-600 hover:border-indigo-200"}`}
     >
       🔊
     </button>
@@ -508,12 +494,12 @@ function StarButton({ active, onClick }) {
       type="button"
       aria-label="Favorite"
       onClick={(e) => { e.stopPropagation(); onClick(); }}
-      className={`w-9 h-9 shrink-0 grid place-items-center rounded-full border text-[15px] transition
+      className={`w-9 h-9 shrink-0 grid place-items-center rounded-full border text-[15px] transition no-tap-highlight
         ${active
-          ? 'border-amber-300 bg-amber-50 text-amber-500'
-          : 'border-slate-200 bg-white text-slate-400 hover:text-amber-500 hover:border-amber-200'}`}
+          ? "border-amber-300 bg-amber-50 text-amber-500"
+          : "border-slate-200 bg-white text-slate-400 hover:text-amber-500 hover:border-amber-200"}`}
     >
-      {active ? '★' : '☆'}
+      {active ? "★" : "☆"}
     </button>
   );
 }
@@ -521,13 +507,13 @@ function StarButton({ active, onClick }) {
 function PosBadge({ pos }) {
   return (
     <span className="inline-block text-[10px] font-semibold tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-md px-2 py-0.5">
-      {POS_LABEL[pos] || pos.toUpperCase()}
+      {POS_LABEL[pos] || (pos || "").toUpperCase()}
     </span>
   );
 }
 
 /* ============================================================
-   6. VOCABULARY CARD
+   VOCABULARY CARD + DETAIL
    ============================================================ */
 function VocabularyCard({ word, isFavorite, onOpen, onToggleFavorite }) {
   return (
@@ -556,9 +542,6 @@ function VocabularyCard({ word, isFavorite, onOpen, onToggleFavorite }) {
   );
 }
 
-/* ============================================================
-   7. VOCABULARY DETAIL
-   ============================================================ */
 function VocabularyDetail({ word, isFavorite, onToggleFavorite, onBack, onFlashcard }) {
   if (!word) return null;
   return (
@@ -616,10 +599,10 @@ function VocabularyDetail({ word, isFavorite, onToggleFavorite, onBack, onFlashc
             onClick={() => onToggleFavorite(word.id)}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition
               ${isFavorite
-                ? 'border-amber-300 bg-amber-50 text-amber-700'
-                : 'border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:text-amber-700'}`}
+                ? "border-amber-300 bg-amber-50 text-amber-700"
+                : "border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:text-amber-700"}`}
           >
-            <span>{isFavorite ? '★' : '☆'}</span> Favorite
+            <span>{isFavorite ? "★" : "☆"}</span> Favorite
           </button>
         </div>
       </div>
@@ -628,7 +611,7 @@ function VocabularyDetail({ word, isFavorite, onToggleFavorite, onBack, onFlashc
 }
 
 /* ============================================================
-   8. SEARCH + FILTER
+   SEARCH + FILTER
    ============================================================ */
 function SearchBar({ value, onChange }) {
   return (
@@ -643,7 +626,7 @@ function SearchBar({ value, onChange }) {
       />
       {value && (
         <button
-          onClick={() => onChange('')}
+          onClick={() => onChange("")}
           className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 grid place-items-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           aria-label="Clear"
         >×</button>
@@ -664,8 +647,8 @@ function FilterPanel({ pos, onPos, topic, onTopic, onlyFav, onOnlyFav, resultCou
               onClick={() => onPos(p)}
               className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition
                 ${pos === p
-                  ? 'bg-indigo-600 border-indigo-600 text-white'
-                  : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-700'}`}
+                  ? "bg-indigo-600 border-indigo-600 text-white"
+                  : "bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-700"}`}
             >{p}</button>
           ))}
         </div>
@@ -675,11 +658,11 @@ function FilterPanel({ pos, onPos, topic, onTopic, onlyFav, onOnlyFav, resultCou
         <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-2">Topic</p>
         <div className="flex flex-wrap gap-1.5">
           <button
-            onClick={() => onTopic('All')}
+            onClick={() => onTopic("All")}
             className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition
-              ${topic === 'All'
-                ? 'bg-indigo-600 border-indigo-600 text-white'
-                : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-700'}`}
+              ${topic === "All"
+                ? "bg-indigo-600 border-indigo-600 text-white"
+                : "bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-700"}`}
           >All</button>
           {TOPICS.map(t => (
             <button
@@ -687,8 +670,8 @@ function FilterPanel({ pos, onPos, topic, onTopic, onlyFav, onOnlyFav, resultCou
               onClick={() => onTopic(t)}
               className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition
                 ${topic === t
-                  ? 'bg-indigo-600 border-indigo-600 text-white'
-                  : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-700'}`}
+                  ? "bg-indigo-600 border-indigo-600 text-white"
+                  : "bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-700"}`}
             >{t}</button>
           ))}
         </div>
@@ -699,10 +682,10 @@ function FilterPanel({ pos, onPos, topic, onTopic, onlyFav, onOnlyFav, resultCou
           onClick={() => onOnlyFav(!onlyFav)}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium border transition
             ${onlyFav
-              ? 'bg-amber-50 border-amber-300 text-amber-700'
-              : 'bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700'}`}
+              ? "bg-amber-50 border-amber-300 text-amber-700"
+              : "bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:text-amber-700"}`}
         >
-          <span>{onlyFav ? '★' : '☆'}</span> Favorites only
+          <span>{onlyFav ? "★" : "☆"}</span> Favorites only
         </button>
         <span className="text-[13px] text-slate-400">{resultCount} từ</span>
       </div>
@@ -711,7 +694,7 @@ function FilterPanel({ pos, onPos, topic, onTopic, onlyFav, onOnlyFav, resultCou
 }
 
 /* ============================================================
-   9. HOME
+   HOME
    ============================================================ */
 function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord }) {
   const dueWords = useMemo(
@@ -720,25 +703,23 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
   );
   const todayCount = store.activity[dateKey()] || 0;
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
-  const mastered = WORDS.filter(w => store.cards[w.id]?.level === 'mastered').length;
+  const mastered = WORDS.filter(w => store.cards[w.id]?.level === "mastered").length;
   const learning = WORDS.filter(w => {
     const c = store.cards[w.id];
-    return c && c.lastReviewed && c.level !== 'mastered';
+    return c && c.lastReviewed && c.level !== "mastered";
   }).length;
 
   const sample = useMemo(() => shuffle(WORDS).slice(0, 4), []);
 
   return (
     <div className="space-y-6">
-      {/* Welcome */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{greeting} 👋</h1>
         <p className="mt-1.5 text-slate-500">Ready to learn some vocabulary?</p>
       </div>
 
-      {/* Today's progress */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
         <div className="flex items-end justify-between mb-3">
           <div>
@@ -757,13 +738,12 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
         <ProgressBar value={Math.min(todayCount, DAILY_GOAL)} max={DAILY_GOAL} />
       </div>
 
-      {/* Review reminder */}
       {dueWords.length > 0 && (
         <div className="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="font-semibold text-indigo-900">
-                You have {dueWords.length} word{dueWords.length > 1 ? 's' : ''} to review today.
+                You have {dueWords.length} word{dueWords.length > 1 ? "s" : ""} to review today.
               </p>
               <p className="mt-1 text-sm text-indigo-700/80">
                 Ôn lại những từ bạn sắp quên — chỉ mất vài phút.
@@ -772,14 +752,11 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
             <button
               onClick={onStartReview}
               className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition shadow-sm"
-            >
-              Review Now
-            </button>
+            >Review Now</button>
           </div>
         </div>
       )}
 
-      {/* Quick actions */}
       <div>
         <h2 className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-3">Quick actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -802,7 +779,7 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
           </button>
 
           <button
-            onClick={() => onNavigate('practice')}
+            onClick={() => onNavigate("practice")}
             className="bg-white border border-slate-200 rounded-2xl p-5 text-left shadow-sm hover:shadow-md hover:border-indigo-200 transition"
           >
             <span className="text-2xl">📝</span>
@@ -812,12 +789,11 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
         </div>
       </div>
 
-      {/* Snapshot */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Mastered', value: mastered, tone: 'text-emerald-600' },
-          { label: 'Learning', value: learning, tone: 'text-amber-600' },
-          { label: 'New', value: WORDS.length - mastered - learning, tone: 'text-slate-500' }
+          { label: "Mastered", value: mastered, tone: "text-emerald-600" },
+          { label: "Learning", value: learning, tone: "text-amber-600" },
+          { label: "New", value: WORDS.length - mastered - learning, tone: "text-slate-500" }
         ].map(s => (
           <div key={s.label} className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-sm">
             <p className={`text-xl font-bold ${s.tone}`}>{s.value}</p>
@@ -826,12 +802,11 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
         ))}
       </div>
 
-      {/* Word of the moment */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Từ hôm nay</h2>
           <button
-            onClick={() => onNavigate('vocabulary')}
+            onClick={() => onNavigate("vocabulary")}
             className="text-[13px] font-medium text-indigo-600 hover:text-indigo-700"
           >Xem tất cả →</button>
         </div>
@@ -846,7 +821,7 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-900 truncate">{w.word}</p>
                   <p className="text-xs text-slate-400">{w.ipa}</p>
-                  <p className="mt-2 text-sm text-slate-700 leading-snug line-clamp-2">🇻🇳 {w.vi}</p>
+                  <p className="mt-2 text-sm text-slate-700 leading-snug">🇻🇳 {w.vi}</p>
                 </div>
                 <AudioButton text={w.word} />
               </div>
@@ -859,12 +834,12 @@ function Home({ store, onNavigate, onStartReview, onStartFlashcards, onOpenWord 
 }
 
 /* ============================================================
-   10. VOCABULARY PAGE
+   VOCABULARY PAGE
    ============================================================ */
-function Vocabulary({ store, onOpen, onToggleFavorite, favorites }) {
-  const [query, setQuery] = useState('');
-  const [pos, setPos] = useState('All');
-  const [topic, setTopic] = useState('All');
+function Vocabulary({ favorites, onOpen, onToggleFavorite }) {
+  const [query, setQuery] = useState("");
+  const [pos, setPos] = useState("All");
+  const [topic, setTopic] = useState("All");
   const [onlyFav, setOnlyFav] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [limit, setLimit] = useState(60);
@@ -872,11 +847,11 @@ function Vocabulary({ store, onOpen, onToggleFavorite, favorites }) {
   const filtered = useMemo(() => {
     const needle = normalize(query.trim());
     return WORDS.filter(w => {
-      if (pos !== 'All' && w.pos.toLowerCase() !== pos.toLowerCase()) return false;
-      if (topic !== 'All' && w.topic !== topic) return false;
+      if (pos !== "All" && w.pos.toLowerCase() !== pos.toLowerCase()) return false;
+      if (topic !== "All" && w.topic !== topic) return false;
       if (onlyFav && !favorites.has(w.id)) return false;
       if (needle) {
-        const hay = normalize(w.word + ' ' + w.vi + ' ' + w.en + ' ' + w.ex);
+        const hay = normalize(w.word + " " + w.vi + " " + w.en + " " + w.ex);
         if (!hay.includes(needle)) return false;
       }
       return true;
@@ -889,11 +864,9 @@ function Vocabulary({ store, onOpen, onToggleFavorite, favorites }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Vocabulary</h1>
-          <p className="mt-1 text-sm text-slate-500">{WORDS.length} từ vựng · tra cứu & lọc nhanh</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Vocabulary</h1>
+        <p className="mt-1 text-sm text-slate-500">{WORDS.length} từ vựng · tra cứu & lọc nhanh</p>
       </div>
 
       <SearchBar value={query} onChange={setQuery} />
@@ -903,8 +876,8 @@ function Vocabulary({ store, onOpen, onToggleFavorite, favorites }) {
           onClick={() => setShowFilters(v => !v)}
           className="w-full flex items-center justify-between text-sm font-medium text-slate-700"
         >
-          <span>🔎 Bộ lọc · {pos} · {topic}{onlyFav ? ' · ★' : ''}</span>
-          <span className="text-slate-400">{showFilters ? '▲' : '▼'}</span>
+          <span>🔎 Bộ lọc · {pos} · {topic}{onlyFav ? " · ★" : ""}</span>
+          <span className="text-slate-400">{showFilters ? "▲" : "▼"}</span>
         </button>
         {showFilters && (
           <div className="mt-4 pt-4 border-t border-slate-100">
@@ -953,25 +926,26 @@ function Vocabulary({ store, onOpen, onToggleFavorite, favorites }) {
 }
 
 /* ============================================================
-   11. FLASHCARDS
+   FLASHCARDS
    ============================================================ */
 function FlashcardFace({ children, side }) {
   return (
-    <div className={`flip-face ${side === 'back' ? 'back' : ''} bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col`}>
+    <div className={`flip-face ${side === "back" ? "back" : ""} bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8 flex flex-col`}>
       {children}
     </div>
   );
 }
 
 function Flashcards({ store, onRate, onExit, seedWordId }) {
-  const [direction, setDirection] = useState(store.settings.direction || 'en-vi');
+  const [direction, setDirection] = useState(store.settings.direction || "en-vi");
   const [queue, setQueue] = useState([]);
   const [total, setTotal] = useState(0);
-  const [answered, setAnswered] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [reviewed, setReviewed] = useState(0);
+  const [initialized, setInitialized] = useState(false);
 
-  // Build the session once on mount
+  // Build session once on mount
   useEffect(() => {
     let ids;
     if (seedWordId) {
@@ -979,13 +953,19 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
     } else {
       const dueIds = WORDS.filter(w => dueToday(store.cards[w.id])).map(w => w.id);
       const newIds = WORDS.filter(w => isNewCard(store.cards[w.id])).map(w => w.id);
-      const rest = WORDS.filter(w => !dueIds.includes(w.id) && !newIds.includes(w.id)).map(w => w.id);
-      ids = [...dueIds, ...newIds, ...rest].slice(0, SESSION_SIZE);
+      const restIds = WORDS
+        .filter(w => !dueIds.includes(w.id) && !newIds.includes(w.id))
+        .map(w => w.id);
+      ids = [...dueIds, ...newIds, ...restIds].slice(0, SESSION_SIZE);
     }
     setQueue(ids);
     setTotal(ids.length);
+    setInitialized(true);
     // eslint-disable-next-line
   }, [seedWordId]);
+
+  // Reset revealed when direction changes
+  useEffect(() => { setRevealed(false); }, [direction]);
 
   const currentId = queue[0];
   const current = currentId ? WORD_BY_ID[currentId] : null;
@@ -993,19 +973,25 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
   const handleRate = (rating) => {
     if (!current) return;
     onRate(current.id, rating);
-    setAnswered(a => a + 1);
+    setReviewed(r => r + 1);
     setQueue(q => {
       const [head, ...rest] = q;
-      if (rating === 'again') return [...rest, head];   // come back later this session
+      if (rating === "again") return [...rest, head];
       return rest;
     });
     setRevealed(false);
   };
 
-  // Finished?
+  // Detect finish
   useEffect(() => {
-    if (total > 0 && queue.length === 0) setFinished(true);
-  }, [queue, total]);
+    if (initialized && total > 0 && queue.length === 0) {
+      setFinished(true);
+    }
+  }, [queue, total, initialized]);
+
+  if (!initialized) {
+    return <div className="text-center py-16 text-slate-400">Đang tải…</div>;
+  }
 
   if (total === 0) {
     return (
@@ -1013,9 +999,10 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
         <p className="text-4xl">📚</p>
         <h1 className="mt-4 text-xl font-bold text-slate-900">Không có thẻ nào để học</h1>
         <p className="mt-2 text-slate-500">Hãy thêm từ vựng trước nhé.</p>
-        <button onClick={onExit} className="mt-6 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">
-          Về trang chủ
-        </button>
+        <button
+          onClick={onExit}
+          className="mt-6 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
+        >Về trang chủ</button>
       </div>
     );
   }
@@ -1027,11 +1014,11 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
           <p className="text-5xl">🎉</p>
           <h1 className="mt-4 text-2xl font-bold text-slate-900">Session complete!</h1>
           <p className="mt-2 text-slate-500">
-            You reviewed <span className="font-semibold text-slate-800">{answered}</span> {answered === 1 ? 'word' : 'words'}.
+            You reviewed <span className="font-semibold text-slate-800">{total}</span> {total === 1 ? "word" : "words"}.
           </p>
           <p className="mt-1 text-slate-500">Great job!</p>
 
-          <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="mt-7">
             <button
               onClick={onExit}
               className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
@@ -1042,12 +1029,12 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
     );
   }
 
-  const frontIsEnglish = direction === 'en-vi';
+  const frontIsEnglish = direction === "en-vi";
+  const answeredCount = total - queue.length;
 
   return (
     <div className="max-w-xl mx-auto space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <button
           onClick={onExit}
           className="text-sm font-medium text-slate-500 hover:text-slate-900 transition"
@@ -1056,30 +1043,28 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
           value={direction}
           onChange={setDirection}
           options={[
-            { value: 'en-vi', label: 'English → Vietnamese' },
-            { value: 'vi-en', label: 'Vietnamese → English' }
+            { value: "en-vi", label: "English → Vietnamese" },
+            { value: "vi-en", label: "Vietnamese → English" }
           ]}
         />
       </div>
 
-      {/* Progress */}
       <div>
         <div className="flex items-center justify-between text-[13px] text-slate-500 mb-2">
-          <span>{Math.min(answered, total)} / {total}</span>
+          <span>{answeredCount} / {total}</span>
           <span>{queue.length} còn lại</span>
         </div>
-        <ProgressBar value={Math.min(answered, total)} max={total} />
+        <ProgressBar value={answeredCount} max={total} />
       </div>
 
-      {/* Card */}
       <div className="flip-scene">
         <div
-          className={`flip-inner cursor-pointer no-tap-highlight ${revealed ? 'is-flipped' : ''}`}
+          className={`flip-inner cursor-pointer no-tap-highlight ${revealed ? "flipped" : ""}`}
           onClick={() => setRevealed(r => !r)}
         >
           {/* FRONT */}
           <FlashcardFace side="front">
-            <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[280px] sm:min-h-[320px]">
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
               {frontIsEnglish ? (
                 <>
                   <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 break-words">{current.word}</h2>
@@ -1104,15 +1089,10 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
 
           {/* BACK */}
           <FlashcardFace side="back">
-            <div className="flex-1 flex flex-col justify-center min-h-[280px] sm:min-h-[320px]">
+            <div className="flex-1 flex flex-col justify-center py-4">
               <div className="text-center">
-                {!frontIsEnglish && (
-                  <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 break-words">{current.word}</h2>
-                )}
-                {!frontIsEnglish && <p className="mt-1.5 text-slate-400">{current.ipa}</p>}
-                {frontIsEnglish && (
-                  <h2 className="text-xl font-bold text-slate-400">{current.word}</h2>
-                )}
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 break-words">{current.word}</h2>
+                <p className="mt-1.5 text-slate-400">{current.ipa}</p>
                 <div className="mt-3 flex justify-center"><PosBadge pos={current.pos} /></div>
               </div>
 
@@ -1136,20 +1116,19 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="min-h-[64px]">
         {revealed ? (
           <div className="grid grid-cols-3 gap-2.5">
             <button
-              onClick={() => handleRate('again')}
+              onClick={() => handleRate("again")}
               className="py-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-sm font-semibold hover:bg-rose-100 active:bg-rose-200 transition"
             >Again</button>
             <button
-              onClick={() => handleRate('good')}
+              onClick={() => handleRate("good")}
               className="py-3 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 text-sm font-semibold hover:bg-indigo-100 active:bg-indigo-200 transition"
             >Good</button>
             <button
-              onClick={() => handleRate('easy')}
+              onClick={() => handleRate("easy")}
               className="py-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 active:bg-emerald-200 transition"
             >Easy</button>
           </div>
@@ -1162,15 +1141,16 @@ function Flashcards({ store, onRate, onExit, seedWordId }) {
 }
 
 /* ============================================================
-   12. PRACTICE (Multiple Choice only)
+   PRACTICE — Multiple choice only
    ============================================================ */
 function buildQuestions(pool, count, direction) {
   const targets = shuffle(pool).slice(0, count);
-  return targets.map(target => {
-    const dir = direction === 'mixed'
-      ? (Math.random() < 0.5 ? 'en-vi' : 'vi-en')
+  const out = [];
+  for (const target of targets) {
+    const dir = direction === "mixed"
+      ? (Math.random() < 0.5 ? "en-vi" : "vi-en")
       : direction;
-    const key = dir === 'en-vi' ? 'vi' : 'word';
+    const key = dir === "en-vi" ? "vi" : "word";
 
     const seen = new Set([target[key]]);
     const distractors = [];
@@ -1181,34 +1161,35 @@ function buildQuestions(pool, count, direction) {
       seen.add(o[key]);
       distractors.push(o);
     }
-
+    if (distractors.length < 1) continue;
     const options = shuffle([target, ...distractors]);
-    return { target, dir, options };
-  }).filter(q => q.options.length >= 2);
+    out.push({ target, dir, options });
+  }
+  return out;
 }
 
 function MultipleChoice({ question, index, total, onAnswer, selected, revealed, onNext, isLast }) {
   const { target, dir, options } = question;
-
-  const prompt = dir === 'en-vi'
-    ? <>What does <span className="font-bold text-indigo-700">“{target.word}”</span> mean?</>
-    : <>Which word means <span className="font-bold text-indigo-700">“{target.vi}”</span>?</>;
-
-  const isCorrect = (opt) => opt.id === target.id;
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
       <div>
         <div className="flex items-center justify-between text-[13px] text-slate-500 mb-2">
           <span>Question {index + 1} / {total}</span>
-          <span>{dir === 'en-vi' ? 'EN → VI' : 'VI → EN'}</span>
+          <span>{dir === "en-vi" ? "EN → VI" : "VI → EN"}</span>
         </div>
         <ProgressBar value={index + (revealed ? 1 : 0)} max={total} />
       </div>
 
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-7">
-        <p className="text-lg sm:text-xl font-semibold text-slate-900 leading-snug">{prompt}</p>
-        {dir === 'en-vi' && (
+        <p className="text-lg sm:text-xl font-semibold text-slate-900 leading-snug">
+          {dir === "en-vi" ? (
+            <>What does <span className="font-bold text-indigo-700">“{target.word}”</span> mean?</>
+          ) : (
+            <>Which word means <span className="font-bold text-indigo-700">“{target.vi}”</span>?</>
+          )}
+        </p>
+        {dir === "en-vi" && (
           <p className="mt-1.5 text-sm text-slate-400">{target.ipa}</p>
         )}
       </div>
@@ -1216,31 +1197,31 @@ function MultipleChoice({ question, index, total, onAnswer, selected, revealed, 
       <div className="space-y-2.5">
         {options.map((opt, i) => {
           const letter = String.fromCharCode(65 + i);
-          const correct = isCorrect(opt);
+          const correct = opt.id === target.id;
           const chosen = selected && selected.id === opt.id;
 
-          let cls = 'bg-white border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40';
+          let cls = "bg-white border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40";
           if (revealed) {
-            if (correct) cls = 'bg-emerald-50 border-emerald-300';
-            else if (chosen) cls = 'bg-rose-50 border-rose-300';
-            else cls = 'bg-white border-slate-200 opacity-60';
+            if (correct) cls = "bg-emerald-50 border-emerald-300";
+            else if (chosen) cls = "bg-rose-50 border-rose-300";
+            else cls = "bg-white border-slate-200 opacity-60";
           }
 
           return (
             <button
-              key={opt.id + '-' + i}
+              key={opt.id + "-" + i}
               disabled={revealed}
               onClick={() => onAnswer(opt)}
-              className={`w-full text-left flex items-start gap-3 p-4 rounded-2xl border transition no-tap-highlight ${cls} ${revealed ? 'cursor-default' : 'cursor-pointer'}`}
+              className={`w-full text-left flex items-start gap-3 p-4 rounded-2xl border transition no-tap-highlight ${cls} ${revealed ? "cursor-default" : "cursor-pointer"}`}
             >
               <span className={`shrink-0 w-7 h-7 grid place-items-center rounded-lg text-[13px] font-semibold border
-                ${revealed && correct ? 'bg-emerald-600 border-emerald-600 text-white'
-                  : revealed && chosen ? 'bg-rose-600 border-rose-600 text-white'
-                  : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                ${revealed && correct ? "bg-emerald-600 border-emerald-600 text-white"
+                  : revealed && chosen ? "bg-rose-600 border-rose-600 text-white"
+                  : "bg-slate-50 border-slate-200 text-slate-500"}`}>
                 {letter}
               </span>
               <span className="text-[15px] text-slate-800 leading-snug pt-0.5">
-                {dir === 'en-vi' ? opt.vi : opt.word}
+                {dir === "en-vi" ? opt.vi : opt.word}
               </span>
             </button>
           );
@@ -1251,16 +1232,16 @@ function MultipleChoice({ question, index, total, onAnswer, selected, revealed, 
         <div className="space-y-4">
           <div className={`rounded-2xl border p-4 text-center font-semibold
             ${selected && selected.id === target.id
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border-rose-200 text-rose-800'}`}>
-            {selected && selected.id === target.id ? '✅ Correct!' : '❌ Not quite.'}
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"}`}>
+            {selected && selected.id === target.id ? "✅ Correct!" : "❌ Not quite."}
           </div>
 
           {!(selected && selected.id === target.id) && (
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <p className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Đáp án đúng</p>
               <p className="mt-1.5 text-[15px] text-slate-900">
-                {dir === 'en-vi' ? target.vi : <span className="font-semibold">{target.word}</span>}
+                {dir === "en-vi" ? target.vi : <span className="font-semibold">{target.word}</span>}
               </p>
               <p className="mt-1 text-sm text-slate-500">{target.en}</p>
             </div>
@@ -1269,7 +1250,7 @@ function MultipleChoice({ question, index, total, onAnswer, selected, revealed, 
           <button
             onClick={onNext}
             className="w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition"
-          >{isLast ? 'Xem kết quả' : 'Next Question'}</button>
+          >{isLast ? "Xem kết quả" : "Next Question"}</button>
         </div>
       )}
     </div>
@@ -1345,54 +1326,60 @@ function PracticeResult({ total, correct, missedIds, onPracticeMistakes, onResta
 }
 
 function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
-  const [phase, setPhase] = useState('setup');   // setup | quiz | result
-  const [mode, setMode] = useState('practice');  // practice | mistakes
+  const [phase, setPhase] = useState("setup");
+  const [mode, setMode] = useState("practice");
   const [count, setCount] = useState(10);
-  const [direction, setDirection] = useState('en-vi');
-  const [source, setSource] = useState('all');
+  const [direction, setDirection] = useState("en-vi");
+  const [source, setSource] = useState("all");
   const [questions, setQuestions] = useState([]);
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [revealed, setRevealed] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [missedIds, setMissedIds] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const finishedRef = React.useRef(false);
 
   const mistakesCount = store.mistakes.length;
   const newCount = WORDS.filter(w => isNewCard(store.cards[w.id])).length;
   const dueCount = WORDS.filter(w => dueToday(store.cards[w.id])).length;
   const favCount = store.favorites.length;
 
-  const startWith = (pool, n, dir) => {
-    if (pool.length < 2) { setError('Không đủ từ để tạo câu hỏi. Hãy chọn nguồn từ khác.'); return; }
+  const startWith = useCallback((pool, n, dir) => {
+    if (!pool || pool.length < 2) {
+      setError("Không đủ từ để tạo câu hỏi. Hãy chọn nguồn từ khác.");
+      return;
+    }
     const qs = buildQuestions(pool, n, dir);
-    if (qs.length === 0) { setError('Không thể tạo câu hỏi. Hãy thử lại.'); return; }
-    setError('');
+    if (qs.length === 0) {
+      setError("Không thể tạo câu hỏi. Hãy thử lại.");
+      return;
+    }
+    setError("");
     setQuestions(qs);
     setQIndex(0);
     setSelected(null);
     setRevealed(false);
     setCorrectCount(0);
     setMissedIds([]);
-    setPhase('quiz');
-  };
-
-  const buildPool = () => {
-    switch (source) {
-      case 'new':     return WORDS.filter(w => isNewCard(store.cards[w.id]));
-      case 'review':  return WORDS.filter(w => dueToday(store.cards[w.id]) || store.cards[w.id]?.level === 'learning');
-      case 'favorites': return WORDS.filter(w => store.favorites.includes(w.id));
-      default:        return WORDS;
-    }
-  };
+    finishedRef.current = false;
+    setPhase("quiz");
+  }, []);
 
   const start = () => {
-    if (mode === 'mistakes') {
+    if (mode === "mistakes") {
       const pool = WORDS.filter(w => store.mistakes.includes(w.id));
-      startWith(pool, Math.min(count, Math.max(pool.length, 0)), direction);
+      startWith(pool, Math.min(count, pool.length), direction);
       return;
     }
-    startWith(buildPool(), count, direction);
+    let pool;
+    switch (source) {
+      case "new":       pool = WORDS.filter(w => isNewCard(store.cards[w.id])); break;
+      case "review":    pool = WORDS.filter(w => dueToday(store.cards[w.id]) || store.cards[w.id]?.level === "learning"); break;
+      case "favorites": pool = WORDS.filter(w => store.favorites.includes(w.id)); break;
+      default:          pool = WORDS;
+    }
+    startWith(pool, count, direction);
   };
 
   const handleAnswer = (opt) => {
@@ -1408,8 +1395,13 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
 
   const next = () => {
     if (qIndex + 1 >= questions.length) {
-      onSessionComplete(correctCount, questions.length);
-      setPhase('result');
+      // finalize
+      const finalCorrect = correctCount; // already updated by the time user clicks
+      if (!finishedRef.current) {
+        finishedRef.current = true;
+        onSessionComplete();
+      }
+      setPhase("result");
       return;
     }
     setQIndex(i => i + 1);
@@ -1418,7 +1410,7 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
   };
 
   /* ---------- SETUP ---------- */
-  if (phase === 'setup') {
+  if (phase === "setup") {
     return (
       <div className="max-w-2xl mx-auto space-y-5">
         <div>
@@ -1433,23 +1425,23 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
               value={mode}
               onChange={setMode}
               options={[
-                { value: 'practice', label: 'Practice' },
-                { value: 'mistakes', label: `Review Mistakes (${mistakesCount})` }
+                { value: "practice", label: "Practice" },
+                { value: "mistakes", label: `Review Mistakes (${mistakesCount})` }
               ]}
             />
-            {mode === 'mistakes' && mistakesCount === 0 && (
+            {mode === "mistakes" && mistakesCount === 0 && (
               <p className="mt-2 text-[13px] text-slate-500">Bạn chưa có từ nào trả lời sai. Hãy luyện tập trước nhé!</p>
             )}
           </div>
 
-          {mode === 'practice' && (
+          {mode === "practice" && (
             <>
               <div>
                 <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-2">Number of questions</p>
                 <Segmented
                   value={count}
                   onChange={setCount}
-                  options={[{ value: 10, label: '10' }, { value: 20, label: '20' }, { value: 30, label: '30' }]}
+                  options={[{ value: 10, label: "10" }, { value: 20, label: "20" }, { value: 30, label: "30" }]}
                 />
               </div>
 
@@ -1459,9 +1451,9 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
                   value={direction}
                   onChange={setDirection}
                   options={[
-                    { value: 'en-vi', label: 'English → Vietnamese' },
-                    { value: 'vi-en', label: 'Vietnamese → English' },
-                    { value: 'mixed', label: 'Mixed' }
+                    { value: "en-vi", label: "English → Vietnamese" },
+                    { value: "vi-en", label: "Vietnamese → English" },
+                    { value: "mixed", label: "Mixed" }
                   ]}
                 />
               </div>
@@ -1472,10 +1464,10 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
                   value={source}
                   onChange={setSource}
                   options={[
-                    { value: 'all', label: `All (${WORDS.length})` },
-                    { value: 'new', label: `New (${newCount})` },
-                    { value: 'review', label: `Review (${dueCount})` },
-                    { value: 'favorites', label: `Favorites (${favCount})` }
+                    { value: "all", label: `All (${WORDS.length})` },
+                    { value: "new", label: `New (${newCount})` },
+                    { value: "review", label: `Review (${dueCount})` },
+                    { value: "favorites", label: `Favorites (${favCount})` }
                   ]}
                 />
               </div>
@@ -1488,7 +1480,11 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
 
           <button
             onClick={start}
-            className="w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition"
+            disabled={mode === "mistakes" && mistakesCount === 0}
+            className={`w-full py-3 rounded-xl text-sm font-semibold transition
+              ${mode === "mistakes" && mistakesCount === 0
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                : "bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800"}`}
           >Start Practice</button>
         </div>
       </div>
@@ -1496,7 +1492,7 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
   }
 
   /* ---------- RESULT ---------- */
-  if (phase === 'result') {
+  if (phase === "result") {
     return (
       <PracticeResult
         total={questions.length}
@@ -1504,25 +1500,39 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
         missedIds={missedIds}
         onPracticeMistakes={() => {
           const pool = missedIds.map(id => WORD_BY_ID[id]).filter(Boolean);
-          setMode('mistakes');
+          if (pool.length < 2) {
+            setError("Không đủ từ để luyện lại.");
+            setPhase("setup");
+            return;
+          }
+          setMode("mistakes");
           startWith(pool, pool.length, direction);
         }}
-        onRestart={() => { setPhase('setup'); }}
+        onRestart={() => setPhase("setup")}
         onExit={onExit}
       />
     );
   }
 
   /* ---------- QUIZ ---------- */
+  const q = questions[qIndex];
+  if (!q) {
+    return (
+      <div className="text-center py-16 text-slate-400">
+        Đang tải câu hỏi…
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <button
-        onClick={() => setPhase('setup')}
+        onClick={() => setPhase("setup")}
         className="text-sm font-medium text-slate-500 hover:text-slate-900 transition"
       >← Thoát</button>
 
       <MultipleChoice
-        question={questions[qIndex]}
+        question={q}
         index={qIndex}
         total={questions.length}
         selected={selected}
@@ -1536,14 +1546,14 @@ function Practice({ store, onAnswerWord, onSessionComplete, onExit }) {
 }
 
 /* ============================================================
-   13. PROGRESS
+   PROGRESS
    ============================================================ */
 function Progress({ store }) {
   const total = WORDS.length;
-  const mastered = WORDS.filter(w => store.cards[w.id]?.level === 'mastered').length;
+  const mastered = WORDS.filter(w => store.cards[w.id]?.level === "mastered").length;
   const learning = WORDS.filter(w => {
     const c = store.cards[w.id];
-    return c && c.lastReviewed && c.level !== 'mastered';
+    return c && c.lastReviewed && c.level !== "mastered";
   }).length;
   const newCount = total - mastered - learning;
 
@@ -1552,7 +1562,7 @@ function Progress({ store }) {
     : 0;
 
   const week = useMemo(() => {
-    const labels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    const labels = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
     const out = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -1573,7 +1583,6 @@ function Progress({ store }) {
         <p className="mt-1 text-sm text-slate-500">Theo dõi tiến độ học từ vựng của bạn.</p>
       </div>
 
-      {/* Vocabulary progress */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6">
         <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Vocabulary progress</p>
         <p className="mt-2 text-3xl font-bold text-slate-900">{total}</p>
@@ -1581,15 +1590,15 @@ function Progress({ store }) {
 
         <div className="mt-5">
           <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-slate-100">
-            <div className="bg-emerald-500 h-full" style={{ width: (mastered / total) * 100 + '%' }} />
-            <div className="bg-amber-400 h-full" style={{ width: (learning / total) * 100 + '%' }} />
-            <div className="bg-slate-200 h-full" style={{ width: (newCount / total) * 100 + '%' }} />
+            <div className="bg-emerald-500 h-full" style={{ width: (mastered / total) * 100 + "%" }} />
+            <div className="bg-amber-400 h-full" style={{ width: (learning / total) * 100 + "%" }} />
+            <div className="bg-slate-200 h-full" style={{ width: (newCount / total) * 100 + "%" }} />
           </div>
           <div className="mt-4 grid grid-cols-3 gap-3">
             {[
-              { label: 'Mastered', value: mastered, dot: 'bg-emerald-500', tone: 'text-emerald-700' },
-              { label: 'Learning', value: learning, dot: 'bg-amber-400', tone: 'text-amber-700' },
-              { label: 'New', value: newCount, dot: 'bg-slate-300', tone: 'text-slate-600' }
+              { label: "Mastered", value: mastered, dot: "bg-emerald-500", tone: "text-emerald-700" },
+              { label: "Learning", value: learning, dot: "bg-amber-400", tone: "text-amber-700" },
+              { label: "New", value: newCount, dot: "bg-slate-300", tone: "text-slate-600" }
             ].map(s => (
               <div key={s.label}>
                 <div className="flex items-center gap-1.5">
@@ -1603,7 +1612,6 @@ function Progress({ store }) {
         </div>
       </div>
 
-      {/* Accuracy */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6">
         <div className="flex items-end justify-between mb-3">
           <div>
@@ -1615,23 +1623,21 @@ function Progress({ store }) {
         <ProgressBar
           value={accuracy}
           max={100}
-          color={accuracy >= 80 ? 'bg-emerald-500' : accuracy >= 60 ? 'bg-amber-400' : 'bg-rose-400'}
+          color={accuracy >= 80 ? "bg-emerald-500" : accuracy >= 60 ? "bg-amber-400" : "bg-rose-400"}
         />
         <p className="mt-2 text-[13px] text-slate-400">
           {store.stats.practiceCorrect} / {store.stats.practiceTotal} câu trả lời đúng
         </p>
       </div>
 
-      {/* Streak */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6 flex items-center justify-between">
         <div>
           <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Learning streak</p>
-          <p className="mt-1.5 text-xl font-bold text-slate-900">🔥 {store.streak.count} day{store.streak.count === 1 ? '' : 's'} streak</p>
+          <p className="mt-1.5 text-xl font-bold text-slate-900">🔥 {store.streak.count} day{store.streak.count === 1 ? "" : "s"} streak</p>
           <p className="mt-0.5 text-[13px] text-slate-500">Học mỗi ngày để giữ chuỗi nhé!</p>
         </div>
       </div>
 
-      {/* Weekly activity */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6">
         <div className="flex items-end justify-between mb-5">
           <div>
@@ -1644,26 +1650,25 @@ function Progress({ store }) {
         <div className="flex items-end justify-between gap-2 h-36">
           {week.map(d => (
             <div key={d.key} className="flex-1 flex flex-col items-center justify-end h-full gap-2">
-              <span className="text-[11px] font-medium text-slate-500">{d.value > 0 ? d.value : ''}</span>
+              <span className="text-[11px] font-medium text-slate-500">{d.value > 0 ? d.value : ""}</span>
               <div className="w-full flex-1 flex items-end">
                 <div
-                  className={`w-full rounded-t-lg transition-all duration-500 ${d.isToday ? 'bg-indigo-600' : 'bg-indigo-200'}`}
-                  style={{ height: Math.max(d.value > 0 ? 8 : 3, (d.value / maxVal) * 100) + '%' }}
+                  className={`w-full rounded-t-lg transition-all duration-500 ${d.isToday ? "bg-indigo-600" : "bg-indigo-200"}`}
+                  style={{ height: Math.max(d.value > 0 ? 8 : 3, (d.value / maxVal) * 100) + "%" }}
                 />
               </div>
-              <span className={`text-[11px] ${d.isToday ? 'font-semibold text-indigo-700' : 'text-slate-400'}`}>{d.label}</span>
+              <span className={`text-[11px] ${d.isToday ? "font-semibold text-indigo-700" : "text-slate-400"}`}>{d.label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Review queue */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6">
         <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Upcoming reviews</p>
         <p className="mt-2 text-sm text-slate-600">
           <span className="font-semibold text-slate-900">
             {WORDS.filter(w => dueToday(store.cards[w.id])).length}
-          </span> từ cần ôn hôm nay ·{' '}
+          </span> từ cần ôn hôm nay ·{" "}
           <span className="font-semibold text-slate-900">{store.mistakes.length}</span> từ hay sai
         </p>
       </div>
@@ -1672,24 +1677,23 @@ function Progress({ store }) {
 }
 
 /* ============================================================
-   14. NAVBAR
+   NAVBAR
    ============================================================ */
 const NAV_ITEMS = [
-  { id: 'home', label: 'Home', icon: '🏠' },
-  { id: 'vocabulary', label: 'Vocabulary', icon: '📚' },
-  { id: 'flashcards', label: 'Flashcards', icon: '🃏' },
-  { id: 'practice', label: 'Practice', icon: '📝' },
-  { id: 'progress', label: 'Progress', icon: '📊' }
+  { id: "home", label: "Home", icon: "🏠" },
+  { id: "vocabulary", label: "Vocabulary", icon: "📚" },
+  { id: "flashcards", label: "Flashcards", icon: "🃏" },
+  { id: "practice", label: "Practice", icon: "📝" },
+  { id: "progress", label: "Progress", icon: "📊" }
 ];
 
 function Navbar({ page, onNavigate, dueCount }) {
   return (
     <>
-      {/* Top bar */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <button
-            onClick={() => onNavigate('home')}
+            onClick={() => onNavigate("home")}
             className="flex items-center gap-2.5 no-tap-highlight"
           >
             <span className="w-9 h-9 rounded-xl bg-indigo-600 text-white grid place-items-center font-bold text-sm shadow-sm">VV</span>
@@ -1706,12 +1710,12 @@ function Navbar({ page, onNavigate, dueCount }) {
                   key={item.id}
                   onClick={() => onNavigate(item.id)}
                   className={`relative px-3.5 py-2 rounded-xl text-sm font-medium transition
-                    ${active ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+                    ${active ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"}`}
                 >
                   <span className="mr-1.5">{item.icon}</span>{item.label}
-                  {item.id === 'home' && dueCount > 0 && (
+                  {item.id === "home" && dueCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full bg-indigo-600 text-white text-[10px] font-bold">
-                      {dueCount > 99 ? '99+' : dueCount}
+                      {dueCount > 99 ? "99+" : dueCount}
                     </span>
                   )}
                 </button>
@@ -1720,12 +1724,11 @@ function Navbar({ page, onNavigate, dueCount }) {
           </nav>
 
           <div className="md:hidden text-[13px] text-slate-400">
-            {dueCount > 0 ? `${dueCount} từ cần ôn` : 'Sẵn sàng học'}
+            {dueCount > 0 ? `${dueCount} từ cần ôn` : "Sẵn sàng học"}
           </div>
         </div>
       </header>
 
-      {/* Bottom nav (mobile) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-5">
           {NAV_ITEMS.map(item => {
@@ -1735,11 +1738,11 @@ function Navbar({ page, onNavigate, dueCount }) {
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 className={`relative flex flex-col items-center gap-0.5 py-2.5 no-tap-highlight transition
-                  ${active ? 'text-indigo-600' : 'text-slate-500'}`}
+                  ${active ? "text-indigo-600" : "text-slate-500"}`}
               >
                 <span className="text-[18px] leading-none">{item.icon}</span>
-                <span className={`text-[10px] ${active ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
-                {item.id === 'home' && dueCount > 0 && (
+                <span className={`text-[10px] ${active ? "font-semibold" : "font-medium"}`}>{item.label}</span>
+                {item.id === "home" && dueCount > 0 && (
                   <span className="absolute top-1.5 right-1/2 translate-x-4 w-2 h-2 rounded-full bg-indigo-600" />
                 )}
               </button>
@@ -1752,18 +1755,20 @@ function Navbar({ page, onNavigate, dueCount }) {
 }
 
 /* ============================================================
-   15. APP
+   APP
    ============================================================ */
 function App() {
   const [store, setStore] = useState(loadStore);
-  const [page, setPage] = useState('home');
+  const [page, setPage] = useState("home");
   const [detailId, setDetailId] = useState(null);
   const [flashSeed, setFlashSeed] = useState(null);
   const [flashKey, setFlashKey] = useState(0);
 
   useEffect(() => { saveStore(store); }, [store]);
 
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [page, detailId]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, detailId]);
 
   const favorites = useMemo(() => new Set(store.favorites), [store.favorites]);
   const dueCount = useMemo(
@@ -1771,10 +1776,13 @@ function App() {
     [store.cards]
   );
 
-  /* ---- actions ---- */
-  const bumpActivity = (prev, amount = 1) => {
+  /* ---- streak + activity helper ---- */
+  const bumpActivity = (prev, amount) => {
     const today = dateKey();
-    const activity = { ...prev.activity, [today]: (prev.activity[today] || 0) + amount };
+    const activity = { ...prev.activity };
+    if (amount) {
+      activity[today] = (activity[today] || 0) + amount;
+    }
     let streak = { ...prev.streak };
     if (streak.last !== today) {
       const yesterday = dateKey(new Date(Date.now() - DAY));
@@ -1789,7 +1797,7 @@ function App() {
       const card = applyRating(prev.cards[id], rating);
       const { activity, streak } = bumpActivity(prev, 1);
       let mistakes = prev.mistakes;
-      if (rating !== 'again' && mistakes.includes(id)) {
+      if (rating !== "again" && mistakes.includes(id)) {
         mistakes = mistakes.filter(m => m !== id);
       }
       return {
@@ -1802,7 +1810,7 @@ function App() {
 
   const answerWord = useCallback((id, correct) => {
     setStore(prev => {
-      const card = applyRating(prev.cards[id], correct ? 'good' : 'again');
+      const card = applyRating(prev.cards[id], correct ? "good" : "again");
       let mistakes = prev.mistakes;
       if (correct) mistakes = mistakes.filter(m => m !== id);
       else if (!mistakes.includes(id)) mistakes = [...mistakes, id];
@@ -1818,9 +1826,9 @@ function App() {
     });
   }, []);
 
-  const completeSession = useCallback((correct, total) => {
+  const completeSession = useCallback(() => {
     setStore(prev => {
-      const { activity, streak } = bumpActivity(prev, 0);
+      const { activity, streak } = bumpActivity(prev, 1);
       return { ...prev, activity, streak };
     });
   }, []);
@@ -1835,10 +1843,6 @@ function App() {
     });
   }, []);
 
-  const setDirection = useCallback((direction) => {
-    setStore(prev => ({ ...prev, settings: { ...prev.settings, direction } }));
-  }, []);
-
   const navigate = (p) => {
     setDetailId(null);
     setPage(p);
@@ -1846,17 +1850,16 @@ function App() {
 
   const openWord = (id) => {
     setDetailId(id);
-    setPage('vocabulary');
+    setPage("vocabulary");
   };
 
   const startFlashcards = (seedId = null) => {
     setFlashSeed(seedId);
     setFlashKey(k => k + 1);
     setDetailId(null);
-    setPage('flashcards');
+    setPage("flashcards");
   };
 
-  /* ---- render ---- */
   const detailWord = detailId ? WORD_BY_ID[detailId] : null;
 
   return (
@@ -1864,7 +1867,7 @@ function App() {
       <Navbar page={page} onNavigate={navigate} dueCount={dueCount} />
 
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6 sm:py-8 pb-24 md:pb-10">
-        {page === 'home' && (
+        {page === "home" && (
           <Home
             store={store}
             onNavigate={navigate}
@@ -1874,7 +1877,7 @@ function App() {
           />
         )}
 
-        {page === 'vocabulary' && (
+        {page === "vocabulary" && (
           detailWord ? (
             <VocabularyDetail
               word={detailWord}
@@ -1885,7 +1888,6 @@ function App() {
             />
           ) : (
             <Vocabulary
-              store={store}
               favorites={favorites}
               onOpen={openWord}
               onToggleFavorite={toggleFavorite}
@@ -1893,26 +1895,26 @@ function App() {
           )
         )}
 
-        {page === 'flashcards' && (
+        {page === "flashcards" && (
           <Flashcards
             key={flashKey}
             store={store}
             onRate={rateWord}
-            onExit={() => navigate('home')}
+            onExit={() => navigate("home")}
             seedWordId={flashSeed}
           />
         )}
 
-        {page === 'practice' && (
+        {page === "practice" && (
           <Practice
             store={store}
             onAnswerWord={answerWord}
             onSessionComplete={completeSession}
-            onExit={() => navigate('home')}
+            onExit={() => navigate("home")}
           />
         )}
 
-        {page === 'progress' && <Progress store={store} />}
+        {page === "progress" && <Progress store={store} />}
       </main>
 
       <footer className="hidden md:block border-t border-slate-200 bg-white/60">
@@ -1924,7 +1926,7 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
