@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#4f46e5" />
+<title>English Vocabulary</title>
+<style>
+  /* ============ RESET & BASE ============ */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  :root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --primary-light: #eef2ff;
+    --primary-soft: #e0e7ff;
+    --success: #10b981;
+    --success-light: #ecfdf5;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --warning: #f59e0b;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --text-soft: #94a3b8;
+    --border: #e2e8f0;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.10);
+    --transition: 0.25s ease;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding-bottom: 32px;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  button:disabled { cursor: not-allowed; opacity: 0.5; }
+  h1, h2, h3, h4 { margin: 0; font-weight: 700; }
+  p { margin: 0; }
+  em { font-style: italic; color: var(--text-muted); }
+  small { font-size: 0.85em; }
+
+  /* ============ HEADER ============ */
+  .app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    color: #fff;
+    padding: 18px 16px 14px;
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 2px 12px rgba(79, 70, 229, 0.25);
+  }
+  .header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; max-width: 960px; margin: 0 auto;
+  }
+  .app-title {
+    font-size: 1.15rem; font-weight: 700;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .level-badge {
+    background: rgba(255,255,255,0.22);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
+  /* ============ TAB NAV ============ */
+  .tab-nav {
+    display: flex; gap: 6px;
+    overflow-x: auto; scrollbar-width: none;
+    padding: 12px 16px;
+    max-width: 960px; margin: 0 auto;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.82rem; font-weight: 600;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .nav-btn:hover { border-color: var(--primary-soft); color: var(--primary); }
+  .nav-btn.active {
+    background: var(--primary); color: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+  }
+
+  /* ============ MAIN ============ */
+  main {
+    max-width: 960px; margin: 0 auto; padding: 0 16px;
+  }
+  .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+  .tab-panel.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ CARDS ============ */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 1.05rem; margin-bottom: 12px; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title {
+    font-size: 1.4rem; margin-bottom: 6px;
+  }
+  .section-sub {
+    color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;
+  }
+
+  /* ============ BUTTONS ============ */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 0.95rem;
+    transition: var(--transition);
+    min-height: 44px;
+    user-select: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(79,70,229,0.35); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-outline { background: var(--card); color: var(--primary); border: 1.5px solid var(--primary-soft); }
+  .btn-outline:hover { background: var(--primary-light); }
+  .btn-ghost { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--primary-light); color: var(--primary); }
+  .btn-danger { background: var(--danger-light); color: var(--danger); border: 1.5px solid #fecaca; }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { filter: brightness(0.95); }
+  .btn-icon {
+    width: 44px; height: 44px; padding: 0; border-radius: 50%;
+    background: var(--primary-light); color: var(--primary);
+    font-size: 1.15rem;
+  }
+  .btn-icon:hover { background: var(--primary-soft); }
+  .btn-block { width: 100%; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ============ HOME ============ */
+  .home-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-lg);
+  }
+  .home-hero h2 {
+    font-size: 1.3rem; margin-bottom: 6px;
+  }
+  .home-hero p {
+    color: rgba(255,255,255,0.85); font-size: 0.92rem;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .stat-label {
+    font-size: 0.75rem; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 1.5rem; font-weight: 700; color: var(--primary);
+    line-height: 1.1;
+  }
+  .stat-value small { font-size: 0.6em; color: var(--text-soft); font-weight: 500; }
+
+  /* ============ PROGRESS BAR ============ */
+  .progress-bar {
+    width: 100%; height: 10px; border-radius: 999px;
+    background: var(--primary-light); overflow: hidden;
+    margin: 10px 0 6px;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--primary), #818cf8);
+    border-radius: 999px; transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-size: 0.82rem; color: var(--text-muted); font-weight: 500;
+  }
+
+  /* ============ VOCAB ============ */
+  .vocab-card {
+    text-align: center;
+  }
+  .vocab-word {
+    font-size: 2rem; font-weight: 800; color: var(--text);
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
+  .vocab-pos {
+    display: inline-block;
+    background: var(--primary-light); color: var(--primary);
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: lowercase; letter-spacing: 0.3px;
+    margin-bottom: 10px;
+  }
+  .vocab-ipa {
+    color: var(--text-muted); font-size: 1rem; font-style: italic;
+    margin-bottom: 16px;
+  }
+  .vocab-actions {
+    display: flex; justify-content: center; gap: 10px; margin-bottom: 16px;
+  }
+  .answer-box {
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: left;
+    margin-top: 12px;
+    animation: fadeIn 0.3s ease;
+    border: 1px dashed var(--primary-soft);
+  }
+  .answer-box .label {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--primary); font-weight: 700; margin-bottom: 4px;
+  }
+  .answer-meaning {
+    font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 14px;
+  }
+  .example-box {
+    background: #fff; border-radius: 8px; padding: 12px;
+    border-left: 3px solid var(--primary);
+  }
+  .example-en { font-size: 0.98rem; color: var(--text); margin-bottom: 4px; }
+  .example-vi { font-size: 0.88rem; color: var(--text-muted); font-style: italic; }
+
+  .nav-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-top: 16px;
+  }
+  .counter {
+    font-size: 0.88rem; color: var(--text-muted); font-weight: 600;
+  }
+
+  /* ============ FLASHCARD ============ */
+  .flashcard {
+    perspective: 1200px;
+    height: 340px;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .flashcard-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+  }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex; flex-direction: column; justify-content: center;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    background: var(--card);
+    overflow-y: auto;
+  }
+  .flashcard-front {
+    align-items: center; text-align: center;
+    background: linear-gradient(160deg, #ffffff 0%, #f5f7ff 100%);
+  }
+  .flashcard-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(160deg, #ffffff 0%, #f0fdf4 100%);
+  }
+  .fc-word {
+    font-size: 2.2rem; font-weight: 800; color: var(--text);
+    margin-bottom: 10px; word-break: break-word;
+  }
+  .fc-hint {
+    color: var(--text-soft); font-size: 0.85rem;
+    display: flex; align-items: center; gap: 6px; margin-top: 8px;
+  }
+  .fc-back-row { margin-bottom: 10px; }
+  .fc-back-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--primary); font-weight: 700; margin-bottom: 2px;
+  }
+  .fc-back-value { font-size: 1rem; color: var(--text); }
+  .fc-back-value.large { font-size: 1.3rem; font-weight: 700; }
+  .learned-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--success-light); color: var(--success);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 700;
+  }
+
+  /* ============ PRACTICE ============ */
+  .question-box {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .question-text {
+    font-size: 1.05rem; color: var(--text); margin-bottom: 16px; line-height: 1.6;
+  }
+  .question-text em {
+    display: block; margin: 6px 0; color: var(--text);
+    font-style: italic; padding: 8px 12px;
+    background: var(--bg); border-radius: 8px;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    text-align: left;
+    font-size: 0.95rem;
+    color: var(--text);
+    transition: var(--transition);
+    display: flex; align-items: center; gap: 10px;
+    min-height: 50px;
+    line-height: 1.4;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--primary); background: var(--primary-light);
+  }
+  .option-btn.correct {
+    border-color: var(--success); background: var(--success-light); color: #065f46;
+    font-weight: 600;
+  }
+  .option-btn.wrong {
+    border-color: var(--danger); background: var(--danger-light); color: #991b1b;
+    font-weight: 600;
+  }
+  .option-btn:disabled { cursor: default; opacity: 1; }
+  .option-letter {
+    flex: 0 0 26px; height: 26px; border-radius: 50%;
+    background: var(--bg); color: var(--text-muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+  }
+  .option-btn.correct .option-letter { background: var(--success); color: #fff; }
+  .option-btn.wrong .option-letter { background: var(--danger); color: #fff; }
+
+  .feedback {
+    margin-top: 14px; padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.92rem;
+    animation: fadeIn 0.3s ease;
+    display: none;
+    line-height: 1.5;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: var(--success-light); color: #065f46; border-left: 4px solid var(--success); }
+  .feedback.wrong { background: var(--danger-light); color: #991b1b; border-left: 4px solid var(--danger); }
+  .feedback strong { color: inherit; }
+
+  /* ============ LISTENING ============ */
+  .listening-card {
+    text-align: center;
+  }
+  .listening-word {
+    font-size: 2rem; font-weight: 800; margin-bottom: 6px;
+    word-break: break-word;
+  }
+  .listening-ipa {
+    color: var(--text-muted); font-style: italic; margin-bottom: 20px;
+  }
+  .listen-btn-group {
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .btn-listen {
+    padding: 14px 20px; border-radius: 999px;
+    background: var(--primary); color: #fff;
+    font-weight: 600; font-size: 0.92rem;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: var(--transition);
+  }
+  .btn-listen:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-listen.slow { background: var(--warning); }
+  .btn-listen.slow:hover { background: #d97706; }
+  .listen-sentence {
+    background: var(--primary-light); border-radius: var(--radius-sm);
+    padding: 16px; margin-bottom: 12px; text-align: left;
+  }
+  .listen-sentence .label {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--primary); font-weight: 700; margin-bottom: 6px;
+  }
+
+  /* ============ REVIEW ============ */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+  .empty-state h3 { color: var(--text); margin-bottom: 6px; font-size: 1.15rem; }
+  .review-item {
+    background: var(--card); border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 10px;
+    border-left: 4px solid var(--danger);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .review-word { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .review-detail { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* ============ PROGRESS TAB ============ */
+  .progress-list {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .progress-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+  }
+  .progress-row:last-child { border-bottom: none; }
+  .progress-row .label { color: var(--text-muted); }
+  .progress-row .value { font-weight: 700; color: var(--text); }
+  .progress-row .value.primary { color: var(--primary); }
+  .progress-row .value.success { color: var(--success); }
+
+  .completed-section {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--success-light); color: var(--success);
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 600;
+    margin: 4px 6px 4px 0;
+  }
+  .completed-section.pending {
+    background: var(--bg); color: var(--text-soft);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (min-width: 640px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    .vocab-word { font-size: 2.4rem; }
+    .flashcard { height: 360px; }
+  }
+  @media (min-width: 900px) {
+    .app-title { font-size: 1.3rem; }
+    .section-title { font-size: 1.6rem; }
+  }
+
+  /* ============ MISC ============ */
+  .hidden { display: none !important; }
+  .text-center { text-align: center; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-12 { margin-bottom: 12px; }
+  .row-gap { display: flex; gap: 10px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-top">
+    <h1 class="app-title" id="appTitle">English Vocabulary</h1>
+    <span class="level-badge" id="levelBadge">B1</span>
+  </div>
+</header>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="nav-btn active" data-tab="home">🏠 Home</button>
+  <button class="nav-btn" data-tab="vocabulary">📖 Vocabulary</button>
+  <button class="nav-btn" data-tab="flashcards">🃏 Flashcards</button>
+  <button class="nav-btn" data-tab="practice">✏️ Practice</button>
+  <button class="nav-btn" data-tab="listening">🎧 Listening</button>
+  <button class="nav-btn" data-tab="review">🔁 Review</button>
+  <button class="nav-btn" data-tab="progress">📊 Progress</button>
+</nav>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="tab-home" class="tab-panel active">
+    <div class="home-hero">
+      <h2 id="homeTitle">Lesson Title</h2>
+      <p id="homeDesc">Lesson description</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Tổng số từ</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Đã học</div>
+        <div class="stat-value" id="statLearned">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Thành thạo</div>
+        <div class="stat-value" id="statMastered">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Điểm</div>
+        <div class="stat-value" id="statScore">0<small>/0</small></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 Tiến độ học</div>
+      <div class="progress-bar"><div class="progress-fill" id="homeProgressFill"></div></div>
+      <div class="progress-meta">
+        <span id="homeProgressText">0%</span>
+        <span id="homeProgressCount">0 / 0 từ</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="startBtn">🚀 Bắt đầu học</button>
+  </section>
+
+  <!-- ============ VOCABULARY ============ -->
+  <section id="tab-vocabulary" class="tab-panel">
+    <h2 class="section-title">📖 Vocabulary</h2>
+    <p class="section-sub">Xem từng từ và nghĩa của chúng</p>
+
+    <div class="card vocab-card">
+      <div class="vocab-word" id="vocabWord">—</div>
+      <div class="vocab-pos" id="vocabPos">—</div>
+      <div class="vocab-ipa" id="vocabIpa"></div>
+
+      <div class="vocab-actions">
+        <button class="btn-icon" id="vocabSpeakBtn" title="Phát âm">🔊</button>
+        <button class="btn btn-outline" id="vocabToggleAnswer">👁️ Xem đáp án</button>
+      </div>
+
+      <div class="answer-box hidden" id="vocabAnswerBox">
+        <div class="label">Nghĩa tiếng Việt</div>
+        <div class="answer-meaning" id="vocabMeaning">—</div>
+        <div class="example-box">
+          <div class="label" style="color:var(--primary); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; margin-bottom:6px;">Ví dụ</div>
+          <div class="example-en" id="vocabExample">—</div>
+          <div class="example-vi" id="vocabExampleMeaning"></div>
+          <button class="btn-icon" id="vocabSpeakExample" title="Nghe ví dụ" style="margin-top:8px; width:36px; height:36px; font-size:1rem;">🔊</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn btn-ghost" id="vocabPrev">← Trước</button>
+      <span class="counter" id="vocabCounter">1 / 1</span>
+      <button class="btn btn-ghost" id="vocabNext">Sau →</button>
+    </div>
+  </section>
+
+  <!-- ============ FLASHCARDS ============ -->
+  <section id="tab-flashcards" class="tab-panel">
+    <h2 class="section-title">🃏 Flashcards</h2>
+    <p class="section-sub">Nhấn vào thẻ để lật</p>
+
+    <div class="flashcard" id="flashcard">
+      <div class="flashcard-inner">
+        <div class="flashcard-face flashcard-front">
+          <div class="fc-word" id="fcFrontWord">—</div>
+          <div class="fc-hint">👆 Nhấn để xem đáp án</div>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <div class="fc-back-row">
+            <div class="fc-back-label">Từ loại</div>
+            <div class="fc-back-value" id="fcBackPos">—</div>
+          </div>
+          <div class="fc-back-row">
+            <div class="fc-back-label">Phiên âm</div>
+            <div class="fc-back-value" id="fcBackIpa">—</div>
+          </div>
+          <div class="fc-back-row">
+            <div class="fc-back-label">Nghĩa</div>
+            <div class="fc-back-value large" id="fcBackMeaning">—</div>
+          </div>
+          <div class="fc-back-row">
+            <div class="fc-back-label">Ví dụ</div>
+            <div class="fc-back-value" id="fcBackExample">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="justify-content:center; margin-bottom:16px;">
+      <button class="btn btn-outline" id="fcSpeakBtn">🔊 Nghe</button>
+      <button class="btn btn-success" id="fcMarkBtn">✓ Đã học</button>
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn btn-ghost" id="fcPrev">← Trước</button>
+      <span class="counter" id="fcCounter">1 / 1</span>
+      <button class="btn btn-ghost" id="fcNext">Sau →</button>
+    </div>
+  </section>
+
+  <!-- ============ PRACTICE ============ -->
+  <section id="tab-practice" class="tab-panel">
+    <h2 class="section-title">✏️ Practice</h2>
+    <p class="section-sub">Bài tập tự động từ dữ liệu từ vựng</p>
+
+    <div id="practiceStartCard" class="card text-center">
+      <div style="font-size:2.5rem; margin-bottom:10px;">🎯</div>
+      <h3 style="margin-bottom:8px;">Sẵn sàng luyện tập?</h3>
+      <p style="color:var(--text-muted); margin-bottom:16px; font-size:0.92rem;">
+        Bài tập bao gồm nhiều dạng: Anh→Việt, Việt→Anh, IPA, điền khuyết, ngữ cảnh.
+      </p>
+      <button class="btn btn-primary btn-block" id="practiceStartBtn">Bắt đầu làm bài</button>
+    </div>
+
+    <div id="practiceArea" class="hidden">
+      <div class="card" style="padding:14px 16px;">
+        <div class="progress-bar"><div class="progress-fill" id="practiceProgressFill"></div></div>
+        <div class="progress-meta">
+          <span id="practiceCounter">Câu 1 / 1</span>
+          <span id="practiceScoreLive">Điểm: 0</span>
+        </div>
+      </div>
+
+      <div class="question-box">
+        <div class="question-text" id="practiceQuestion">—</div>
+        <div class="options" id="practiceOptions"></div>
+        <div class="feedback" id="practiceFeedback"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary btn-block hidden" id="practiceNextBtn">Tiếp theo →</button>
+        <button class="btn btn-ghost btn-block" id="practiceRestartBtn">🔄 Làm lại</button>
+      </div>
+    </div>
+
+    <div id="practiceDone" class="card text-center hidden">
+      <div style="font-size:3rem; margin-bottom:10px;">🎉</div>
+      <h3 style="margin-bottom:8px;">Hoàn thành!</h3>
+      <p style="color:var(--text-muted); margin-bottom:16px;" id="practiceDoneText">Bạn đã trả lời đúng 0 / 0 câu.</p>
+      <button class="btn btn-primary btn-block" id="practiceRetryBtn">Làm lại</button>
+    </div>
+  </section>
+
+  <!-- ============ LISTENING ============ -->
+  <section id="tab-listening" class="tab-panel">
+    <h2 class="section-title">🎧 Listening</h2>
+    <p class="section-sub">Luyện nghe với giọng đọc tiếng Anh (British ưu tiên)</p>
+
+    <div class="card listening-card">
+      <div class="listening-word" id="listenWord">—</div>
+      <div class="listening-ipa" id="listenIpa"></div>
+
+      <div class="listen-btn-group">
+        <button class="btn-listen" id="listenPlay">🔊 Listen</button>
+        <button class="btn-listen slow" id="listenSlow">🐢 Listen slowly</button>
+        <button class="btn-listen" id="listenReplay">🔁 Replay</button>
+      </div>
+
+      <div class="listen-sentence">
+        <div class="label">Ví dụ</div>
+        <div class="example-en" id="listenExample">—</div>
+        <div class="example-vi" id="listenExampleMeaning"></div>
+        <button class="btn btn-outline mt-12" id="listenSentenceBtn" style="font-size:0.85rem; padding:8px 14px; min-height:38px;">🔊 Nghe câu ví dụ</button>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn btn-ghost" id="listenPrev">← Trước</button>
+      <span class="counter" id="listenCounter">1 / 1</span>
+      <button class="btn btn-ghost" id="listenNext">Sau →</button>
+    </div>
+  </section>
+
+  <!-- ============ REVIEW ============ -->
+  <section id="tab-review" class="tab-panel">
+    <h2 class="section-title">🔁 Review</h2>
+    <p class="section-sub">Ôn lại những từ bạn đã trả lời sai</p>
+
+    <div id="reviewEmpty" class="card">
+      <div class="empty-state">
+        <span class="emoji">✨</span>
+        <h3>Chưa có từ sai nào</h3>
+        <p>Hãy làm bài luyện tập để hệ thống ghi nhận những từ bạn cần ôn lại.</p>
+      </div>
+    </div>
+
+    <div id="reviewContent" class="hidden">
+      <div class="card" style="padding:14px 16px;">
+        <div class="progress-bar"><div class="progress-fill" id="reviewProgressFill"></div></div>
+        <div class="progress-meta">
+          <span id="reviewCounter">Câu 1 / 1</span>
+          <span id="reviewScoreLive">Điểm: 0</span>
+        </div>
+      </div>
+
+      <div class="question-box">
+        <div class="question-text" id="reviewQuestion">—</div>
+        <div class="options" id="reviewOptions"></div>
+        <div class="feedback" id="reviewFeedback"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary btn-block hidden" id="reviewNextBtn">Tiếp theo →</button>
+        <button class="btn btn-ghost btn-block" id="reviewClearBtn">🗑️ Xoá danh sách</button>
+      </div>
+    </div>
+
+    <div id="reviewDone" class="card text-center hidden">
+      <div style="font-size:3rem; margin-bottom:10px;">✅</div>
+      <h3 style="margin-bottom:8px;">Đã ôn xong!</h3>
+      <p style="color:var(--text-muted); margin-bottom:16px;" id="reviewDoneText">Bạn đã trả lời đúng 0 / 0 câu.</p>
+      <button class="btn btn-primary btn-block" id="reviewRetryBtn">Ôn lại lần nữa</button>
+    </div>
+  </section>
+
+  <!-- ============ PROGRESS ============ -->
+  <section id="tab-progress" class="tab-panel">
+    <h2 class="section-title">📊 Progress</h2>
+    <p class="section-sub">Tiến trình học của bạn được lưu tự động</p>
+
+    <div class="card">
+      <div class="card-title">📌 Tổng quan</div>
+      <div class="progress-list">
+        <div class="progress-row">
+          <span class="label">Tổng số từ</span>
+          <span class="value" id="pgTotal">0</span>
+        </div>
+        <div class="progress-row">
+          <span class="label">Từ đã học</span>
+          <span class="value primary" id="pgLearned">0</span>
+        </div>
+        <div class="progress-row">
+          <span class="label">Từ thành thạo</span>
+          <span class="value success" id="pgMastered">0</span>
+        </div>
+        <div class="progress-row">
+          <span class="label">Điểm luyện tập</span>
+          <span class="value" id="pgScore">0 / 0</span>
+        </div>
+        <div class="progress-row">
+          <span class="label">Câu trả lời sai</span>
+          <span class="value" id="pgWrong">0</span>
+        </div>
+        <div class="progress-row">
+          <span class="label">Lần học cuối</span>
+          <span class="value" id="pgLast">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ Phần đã hoàn thành</div>
+      <div id="pgSections"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary btn-block" id="pgContinueBtn">▶️ Continue learning</button>
+      <button class="btn btn-danger btn-block" id="pgResetBtn">🗑️ Reset progress</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ================================================================
+   ================================================================
+   LESSON DATA — ĐÂY LÀ PHẦN DUY NHẤT CẦN THAY ĐỔI KHI CÓ BÀI MỚI
+   ================================================================
+   Chỉ cần thay object lessonData bên dưới bằng bài học mới.
+   Toàn bộ UI, logic, bài tập, flashcard, listening, review, progress
+   sẽ tự động được tạo lại từ dữ liệu này.
+   ================================================================ */
+
+const lessonData = {
+  title: "Vocabulary – Units 1-3",
+  level: "B1",
+  description: "48 từ vựng học thuật & thông dụng từ Unit 1, 2, 3 (mỗi Unit 2 chapter, mỗi chapter 8 từ)",
+  vocabulary: [
+    /* ===== UNIT 1 – CHAPTER 1 ===== */
+    {
+      word: "academic",
+      pos: "adjective",
+      ipa: "/ˌækəˈdemɪk/",
+      meaning: "thuộc về học thuật, việc học",
+      example: "His academic work is excellent.",
+      exampleMeaning: ""
+    },
+    {
+      word: "component",
+      pos: "noun",
+      ipa: "/kəmˈpəʊnənt/",
+      meaning: "thành phần, bộ phận",
+      example: "The team is working on the last component of their project.",
+      exampleMeaning: ""
+    },
+    {
+      word: "effective",
+      pos: "adjective",
+      ipa: "/ɪˈfektɪv/",
+      meaning: "hiệu quả",
+      example: "The medication is quite effective; it relieves pain quickly.",
+      exampleMeaning: ""
+    },
+    {
+      word: "long-term",
+      pos: "adjective",
+      ipa: "/ˌlɒŋˈtɜːrm/",
+      meaning: "dài hạn, lâu dài",
+      example: "Ben is in a long-term relationship with Denise.",
+      exampleMeaning: ""
+    },
+    {
+      word: "make an effort",
+      pos: "expression",
+      ipa: "/meɪk ən ˈefərt/",
+      meaning: "nỗ lực, cố gắng",
+      example: "Most students made an effort to improve their test scores.",
+      exampleMeaning: ""
+    },
+    {
+      word: "structure",
+      pos: "noun",
+      ipa: "/ˈstrʌktʃər/",
+      meaning: "cấu trúc",
+      example: "The structure of your essay isn't easy to understand.",
+      exampleMeaning: ""
+    },
+    {
+      word: "technique",
+      pos: "noun",
+      ipa: "/tekˈniːk/",
+      meaning: "kỹ thuật, phương pháp",
+      example: "Surgical techniques have developed so that only small cuts are needed for many operations.",
+      exampleMeaning: ""
+    },
+    {
+      word: "transfer",
+      pos: "verb",
+      ipa: "/ˈtrænsfɜːr/",
+      meaning: "chuyển, di chuyển",
+      example: "We transferred our bags from the bus to the car.",
+      exampleMeaning: ""
+    },
+
+    /* ===== UNIT 1 – CHAPTER 2 ===== */
+    {
+      word: "alternative",
+      pos: "adjective",
+      ipa: "/ɔːlˈtɜːrnətɪv/",
+      meaning: "thay thế, khác",
+      example: "An alternative to calling a friend is sending the friend an email.",
+      exampleMeaning: ""
+    },
+    {
+      word: "apply",
+      pos: "verb",
+      ipa: "/əˈplaɪ/",
+      meaning: "áp dụng",
+      example: "You can apply what you learned in school to your first job.",
+      exampleMeaning: ""
+    },
+    {
+      word: "assess",
+      pos: "verb",
+      ipa: "/əˈses/",
+      meaning: "đánh giá",
+      example: "The doctor needs to assess if you're well enough to travel.",
+      exampleMeaning: ""
+    },
+    {
+      word: "interact",
+      pos: "verb",
+      ipa: "/ˌɪntərˈækt/",
+      meaning: "tương tác",
+      example: "Teachers often encourage students to interact with each other in class.",
+      exampleMeaning: ""
+    },
+    {
+      word: "debate",
+      pos: "noun",
+      ipa: "/dɪˈbeɪt/",
+      meaning: "cuộc tranh luận",
+      example: "A discussion about who to vote for often becomes a debate.",
+      exampleMeaning: ""
+    },
+    {
+      word: "measure",
+      pos: "verb",
+      ipa: "/ˈmeʒər/",
+      meaning: "đo lường",
+      example: "I measured the length of the room for a new rug.",
+      exampleMeaning: ""
+    },
+    {
+      word: "memorize",
+      pos: "verb",
+      ipa: "/ˈmeməraɪz/",
+      meaning: "ghi nhớ, học thuộc",
+      example: "Students memorize the verb forms of a new language.",
+      exampleMeaning: ""
+    },
+    {
+      word: "reform",
+      pos: "verb",
+      ipa: "/rɪˈfɔːrm/",
+      meaning: "cải cách",
+      example: "The new president reformed the nation's health care system.",
+      exampleMeaning: ""
+    },
+
+    /* ===== UNIT 2 – CHAPTER 1 ===== */
+    {
+      word: "accommodation",
+      pos: "noun",
+      ipa: "/əˌkɒməˈdeɪʃən/",
+      meaning: "chỗ ở",
+      example: "I need to look for accommodation as soon as I move to a new country.",
+      exampleMeaning: ""
+    },
+    {
+      word: "basic",
+      pos: "adjective",
+      ipa: "/ˈbeɪsɪk/",
+      meaning: "cơ bản",
+      example: "A basic hotel room has a bed and a bathroom, and maybe an air conditioner.",
+      exampleMeaning: ""
+    },
+    {
+      word: "eager",
+      pos: "adjective",
+      ipa: "/ˈiːɡər/",
+      meaning: "háo hức, mong muốn",
+      example: "The little girl was eager to ride a plane for the first time.",
+      exampleMeaning: ""
+    },
+    {
+      word: "exhausting",
+      pos: "adjective",
+      ipa: "/ɪɡˈzɔːstɪŋ/",
+      meaning: "mệt mỏi, kiệt sức",
+      example: "I've had an exhausting day, so I'm going to bed.",
+      exampleMeaning: ""
+    },
+    {
+      word: "fabulous",
+      pos: "adjective",
+      ipa: "/ˈfæbjələs/",
+      meaning: "tuyệt vời",
+      example: "We had a fabulous time on our vacation!",
+      exampleMeaning: ""
+    },
+    {
+      word: "possession",
+      pos: "noun",
+      ipa: "/pəˈzeʃən/",
+      meaning: "tài sản, đồ sở hữu",
+      example: "Her most valuable possession is a car worth $40,000.",
+      exampleMeaning: ""
+    },
+    {
+      word: "range",
+      pos: "noun",
+      ipa: "/reɪndʒ/",
+      meaning: "loạt, phạm vi, dãy",
+      example: "You can find a range of hair products at a beauty salon.",
+      exampleMeaning: ""
+    },
+    {
+      word: "unique",
+      pos: "adjective",
+      ipa: "/juːˈniːk/",
+      meaning: "độc đáo, duy nhất",
+      example: "Each person in the world has a unique personality.",
+      exampleMeaning: ""
+    },
+
+    /* ===== UNIT 2 – CHAPTER 2 ===== */
+    {
+      word: "assume",
+      pos: "verb",
+      ipa: "/əˈsjuːm/",
+      meaning: "giả định, cho rằng",
+      example: "I didn't call because I assumed you were busy.",
+      exampleMeaning: ""
+    },
+    {
+      word: "authorized",
+      pos: "verb",
+      ipa: "/ˈɔːθəraɪzd/",
+      meaning: "được ủy quyền, được phép",
+      example: "You aren't authorized to be in this area.",
+      exampleMeaning: ""
+    },
+    {
+      word: "departure",
+      pos: "noun",
+      ipa: "/dɪˈpɑːrtʃər/",
+      meaning: "sự khởi hành",
+      example: "My departure for Los Angeles is at 8 a.m. tomorrow.",
+      exampleMeaning: ""
+    },
+    {
+      word: "expire",
+      pos: "verb",
+      ipa: "/ɪkˈspaɪər/",
+      meaning: "hết hạn",
+      example: "The milk in the refrigerator expires on Tuesday.",
+      exampleMeaning: ""
+    },
+    {
+      word: "precaution",
+      pos: "noun",
+      ipa: "/prɪˈkɔːʃən/",
+      meaning: "biện pháp phòng ngừa",
+      example: "She took the precaution of bringing a sweater in case it got cold on the trip.",
+      exampleMeaning: ""
+    },
+    {
+      word: "purchase",
+      pos: "verb",
+      ipa: "/ˈpɜːrtʃəs/",
+      meaning: "mua",
+      example: "I purchased my first car when I was 17.",
+      exampleMeaning: ""
+    },
+    {
+      word: "sincere",
+      pos: "adjective",
+      ipa: "/sɪnˈsɪər/",
+      meaning: "chân thành",
+      example: "Her love for you is sincere; she will stay with you in bad times.",
+      exampleMeaning: ""
+    },
+    {
+      word: "vulnerable",
+      pos: "adjective",
+      ipa: "/ˈvʌlnərəbəl/",
+      meaning: "dễ bị tổn thương",
+      example: "An older person is more vulnerable to sickness.",
+      exampleMeaning: ""
+    },
+
+    /* ===== UNIT 3 – CHAPTER 1 ===== */
+    {
+      word: "credits",
+      pos: "noun",
+      ipa: "/ˈkredɪts/",
+      meaning: "danh đề, phần ghi công (phim)",
+      example: "The movie star's name was first in the credits.",
+      exampleMeaning: ""
+    },
+    {
+      word: "crucial",
+      pos: "adjective",
+      ipa: "/ˈkruːʃəl/",
+      meaning: "quan trọng, cốt yếu",
+      example: "It's crucial that children eat a healthy breakfast each morning.",
+      exampleMeaning: ""
+    },
+    {
+      word: "director",
+      pos: "noun",
+      ipa: "/dəˈrektər/",
+      meaning: "đạo diễn, giám đốc",
+      example: "The director of the film was Steven Spielberg.",
+      exampleMeaning: ""
+    },
+    {
+      word: "exclusive",
+      pos: "adjective",
+      ipa: "/ɪkˈskluːsɪv/",
+      meaning: "độc quyền, riêng biệt",
+      example: "This sale is exclusively for members.",
+      exampleMeaning: ""
+    },
+    {
+      word: "production",
+      pos: "noun",
+      ipa: "/prəˈdʌkʃən/",
+      meaning: "sản xuất, quá trình làm phim",
+      example: "Production on the new movie will start next month.",
+      exampleMeaning: ""
+    },
+    {
+      word: "scene",
+      pos: "noun",
+      ipa: "/siːn/",
+      meaning: "cảnh (phim)",
+      example: "I cried while watching the last scene of the movie.",
+      exampleMeaning: ""
+    },
+    {
+      word: "studio",
+      pos: "noun",
+      ipa: "/ˈstuːdiəʊ/",
+      meaning: "xưởng, phòng thu",
+      example: "We take lessons at a ballet studio.",
+      exampleMeaning: ""
+    },
+    {
+      word: "transform",
+      pos: "verb",
+      ipa: "/trænsˈfɔːrm/",
+      meaning: "biến đổi",
+      example: "This book transformed my life; you should read it!",
+      exampleMeaning: ""
+    },
+
+    /* ===== UNIT 3 – CHAPTER 2 ===== */
+    {
+      word: "ambition",
+      pos: "noun",
+      ipa: "/æmˈbɪʃən/",
+      meaning: "hoài bão, tham vọng",
+      example: "Lou's ambition was to become a doctor.",
+      exampleMeaning: ""
+    },
+    {
+      word: "debut",
+      pos: "noun",
+      ipa: "/ˈdeɪbjuː/",
+      meaning: "sự ra mắt, lần đầu xuất hiện",
+      example: "The party was to celebrate the debut of the CD.",
+      exampleMeaning: ""
+    },
+    {
+      word: "influential",
+      pos: "adjective",
+      ipa: "/ˌɪnfluˈenʃəl/",
+      meaning: "có ảnh hưởng",
+      example: "The mayor was very influential in planning the museum.",
+      exampleMeaning: ""
+    },
+    {
+      word: "inspiration",
+      pos: "noun",
+      ipa: "/ˌɪnspəˈreɪʃən/",
+      meaning: "cảm hứng",
+      example: "My inspiration to paint comes from nature.",
+      exampleMeaning: ""
+    },
+    {
+      word: "metaphor",
+      pos: "noun",
+      ipa: "/ˈmetəfɔːr/",
+      meaning: "ẩn dụ",
+      example: "The poet used a metaphor to say people are the same as trees.",
+      exampleMeaning: ""
+    },
+    {
+      word: "passion",
+      pos: "noun",
+      ipa: "/ˈpæʃən/",
+      meaning: "đam mê",
+      example: "The singer said her passion for music comes from her mother.",
+      exampleMeaning: ""
+    },
+    {
+      word: "preserve",
+      pos: "verb",
+      ipa: "/prɪˈzɜːrv/",
+      meaning: "bảo tồn, gìn giữ",
+      example: "We are using less paper in the office to help preserve the forest.",
+      exampleMeaning: ""
+    },
+    {
+      word: "represent",
+      pos: "verb",
+      ipa: "/ˌreprɪˈzent/",
+      meaning: "đại diện, tượng trưng",
+      example: "A wedding ring represents the love between two people.",
+      exampleMeaning: ""
+    }
+  ]
+};
+
+/* ================================================================
+   ================================================================
+   STATE MANAGEMENT (localStorage)
+   ================================================================
+   ================================================================ */
+
+const STORAGE_KEY = 'vocab_app_progress_v1';
+
+const defaultState = {
+  learned: {},          // { word: true }
+  correctCount: {},     // { word: number }  → mastered nếu >= 2
+  practiceScore: 0,
+  practiceTotal: 0,
+  incorrect: [],        // array of question objects
+  completed: {},        // { section: true }
+  lastStudy: null,
+  currentVocabIndex: 0,
+  currentCardIndex: 0,
+  currentListenIndex: 0
+};
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ...defaultState };
+    const parsed = JSON.parse(raw);
+    return { ...defaultState, ...parsed };
+  } catch (e) {
+    return { ...defaultState };
+  }
+}
+
+function saveState() {
+  state.lastStudy = Date.now();
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Không thể lưu tiến trình:', e);
+  }
+}
+
+function isMastered(word) {
+  return (state.correctCount[word] || 0) >= 2;
+}
+
+function countMastered() {
+  return lessonData.vocabulary.filter(v => isMastered(v.word)).length;
+}
+
+/* ================================================================
+   SPEECH SYNTHESIS (Web Speech API)
+   ================================================================ */
+
+let voices = [];
+function loadVoices() {
+  if ('speechSynthesis' in window) {
+    voices = window.speechSynthesis.getVoices();
+  }
+}
+if ('speechSynthesis' in window) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function pickEnglishVoice() {
+  // Ưu tiên en-GB, sau đó bất kỳ giọng tiếng Anh nào
+  const gb = voices.find(v => v.lang === 'en-GB' || v.lang === 'en_GB');
+  if (gb) return gb;
+  const gbLike = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en-gb'));
+  if (gbLike) return gbLike;
+  const anyEn = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+  return anyEn || null;
+}
+
+function speak(text, rate = 1) {
+  if (!text) return;
+  if (!('speechSynthesis' in window)) {
+    alert('Trình duyệt của bạn không hỗ trợ phát âm.');
+    return;
+  }
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-GB';
+    u.rate = rate;
+    u.pitch = 1;
+    const voice = pickEnglishVoice();
+    if (voice) u.voice = voice;
+    window.speechSynthesis.speak(u);
+  } catch (e) {
+    console.warn('Speech error:', e);
+  }
+}
+
+/* ================================================================
+   UTILITIES
+   ================================================================ */
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function escapeRegex(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleString('vi-VN', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+/* ================================================================
+   TAB NAVIGATION
+   ================================================================ */
+
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => {
+    el.classList.toggle('active', el.id === 'tab-' + name);
+  });
+  document.querySelectorAll('.nav-btn').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === name);
+  });
+
+  if (name === 'home') renderHome();
+  if (name === 'vocabulary') renderVocabulary();
+  if (name === 'flashcards') renderFlashcards();
+  if (name === 'practice') renderPracticeLanding();
+  if (name === 'listening') renderListening();
+  if (name === 'review') renderReviewLanding();
+  if (name === 'progress') renderProgress();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('tabNav').addEventListener('click', (e) => {
+  const btn = e.target.closest('.nav-btn');
+  if (!btn) return;
+  showTab(btn.dataset.tab);
+});
+
+/* ================================================================
+   HOME
+   ================================================================ */
+
+function renderHome() {
+  const total = lessonData.vocabulary.length;
+  const learned = Object.keys(state.learned).length;
+  const mastered = countMastered();
+  const pct = total ? Math.round((learned / total) * 100) : 0;
+
+  document.getElementById('appTitle').textContent = lessonData.title || 'English Vocabulary';
+  document.getElementById('levelBadge').textContent = lessonData.level || '—';
+  document.getElementById('homeTitle').textContent = lessonData.title || 'Lesson';
+  document.getElementById('homeDesc').textContent = lessonData.description || '';
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statLearned').textContent = learned;
+  document.getElementById('statMastered').textContent = mastered;
+  document.getElementById('statScore').innerHTML =
+    `${state.practiceScore}<small>/${state.practiceTotal}</small>`;
+
+  document.getElementById('homeProgressFill').style.width = pct + '%';
+  document.getElementById('homeProgressText').textContent = pct + '%';
+  document.getElementById('homeProgressCount').textContent = `${learned} / ${total} từ`;
+}
+
+document.getElementById('startBtn').addEventListener('click', () => showTab('vocabulary'));
+
+/* ================================================================
+   VOCABULARY
+   ================================================================ */
+
+let vocabAnswerVisible = false;
+
+function renderVocabulary() {
+  const vocab = lessonData.vocabulary;
+  if (!vocab.length) return;
+
+  let idx = state.currentVocabIndex || 0;
+  if (idx < 0) idx = 0;
+  if (idx >= vocab.length) idx = vocab.length - 1;
+  state.currentVocabIndex = idx;
+
+  const v = vocab[idx];
+
+  document.getElementById('vocabWord').textContent = v.word;
+  document.getElementById('vocabPos').textContent = v.pos || '';
+  document.getElementById('vocabIpa').textContent = v.ipa || '';
+  document.getElementById('vocabMeaning').textContent = v.meaning || '—';
+  document.getElementById('vocabExample').textContent = v.example || '—';
+  document.getElementById('vocabExampleMeaning').textContent = v.exampleMeaning || '';
+
+  document.getElementById('vocabCounter').textContent = `${idx + 1} / ${vocab.length}`;
+  document.getElementById('vocabPrev').disabled = idx === 0;
+  document.getElementById('vocabNext').disabled = idx === vocab.length - 1;
+
+  // Reset answer state on navigation
+  vocabAnswerVisible = false;
+  document.getElementById('vocabAnswerBox').classList.add('hidden');
+  document.getElementById('vocabToggleAnswer').textContent = '👁️ Xem đáp án';
+
+  // Đánh dấu hoàn thành section khi đến từ cuối
+  if (idx === vocab.length - 1 && !state.completed.vocabulary) {
+    state.completed.vocabulary = true;
+    saveState();
+  }
+}
+
+document.getElementById('vocabToggleAnswer').addEventListener('click', () => {
+  vocabAnswerVisible = !vocabAnswerVisible;
+  document.getElementById('vocabAnswerBox').classList.toggle('hidden', !vocabAnswerVisible);
+  document.getElementById('vocabToggleAnswer').textContent =
+    vocabAnswerVisible ? '🙈 Ẩn đáp án' : '👁️ Xem đáp án';
+});
+
+document.getElementById('vocabPrev').addEventListener('click', () => {
+  if (state.currentVocabIndex > 0) {
+    state.currentVocabIndex--;
+    saveState();
+    renderVocabulary();
+  }
+});
+
+document.getElementById('vocabNext').addEventListener('click', () => {
+  if (state.currentVocabIndex < lessonData.vocabulary.length - 1) {
+    state.currentVocabIndex++;
+    saveState();
+    renderVocabulary();
+  }
+});
+
+document.getElementById('vocabSpeakBtn').addEventListener('click', () => {
+  const v = lessonData.vocabulary[state.currentVocabIndex];
+  if (v) speak(v.word, 1);
+});
+
+document.getElementById('vocabSpeakExample').addEventListener('click', () => {
+  const v = lessonData.vocabulary[state.currentVocabIndex];
+  if (v && v.example) speak(v.example, 0.95);
+});
+
+/* ================================================================
+   FLASHCARDS
+   ================================================================ */
+
+function renderFlashcards() {
+  const vocab = lessonData.vocabulary;
+  if (!vocab.length) return;
+
+  let idx = state.currentCardIndex || 0;
+  if (idx < 0) idx = 0;
+  if (idx >= vocab.length) idx = vocab.length - 1;
+  state.currentCardIndex = idx;
+
+  const v = vocab[idx];
+
+  document.getElementById('fcFrontWord').textContent = v.word;
+  document.getElementById('fcBackPos').textContent = v.pos || '—';
+  document.getElementById('fcBackIpa').textContent = v.ipa || '—';
+  document.getElementById('fcBackMeaning').textContent = v.meaning || '—';
+  document.getElementById('fcBackExample').textContent = v.example || '—';
+
+  document.getElementById('flashcard').classList.remove('flipped');
+
+  document.getElementById('fcCounter').textContent = `${idx + 1} / ${vocab.length}`;
+  document.getElementById('fcPrev').disabled = idx === 0;
+  document.getElementById('fcNext').disabled = idx === vocab.length - 1;
+
+  updateFcMarkBtn(v.word);
+}
+
+function updateFcMarkBtn(word) {
+  const btn = document.getElementById('fcMarkBtn');
+  if (state.learned[word]) {
+    btn.textContent = '✓ Đã học';
+    btn.classList.remove('btn-outline');
+    btn.classList.add('btn-success');
+  } else {
+    btn.textContent = '○ Đánh dấu đã học';
+    btn.classList.remove('btn-success');
+    btn.classList.add('btn-outline');
+  }
+}
+
+document.getElementById('flashcard').addEventListener('click', () => {
+  document.getElementById('flashcard').classList.toggle('flipped');
+});
+
+document.getElementById('fcPrev').addEventListener('click', () => {
+  if (state.currentCardIndex > 0) {
+    state.currentCardIndex--;
+    saveState();
+    renderFlashcards();
+  }
+});
+
+document.getElementById('fcNext').addEventListener('click', () => {
+  if (state.currentCardIndex < lessonData.vocabulary.length - 1) {
+    state.currentCardIndex++;
+    saveState();
+    renderFlashcards();
+  }
+});
+
+document.getElementById('fcSpeakBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const v = lessonData.vocabulary[state.currentCardIndex];
+  if (v) speak(v.word, 1);
+});
+
+document.getElementById('fcMarkBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const v = lessonData.vocabulary[state.currentCardIndex];
+  if (!v) return;
+  if (state.learned[v.word]) {
+    delete state.learned[v.word];
+  } else {
+    state.learned[v.word] = true;
+  }
+  saveState();
+  updateFcMarkBtn(v.word);
+
+  // Đánh dấu section hoàn thành khi tất cả từ đã học
+  const total = lessonData.vocabulary.length;
+  if (Object.keys(state.learned).length >= total && !state.completed.flashcards) {
+    state.completed.flashcards = true;
+    saveState();
+  }
+});
+
+/* ================================================================
+   PRACTICE — Question generation
+   ================================================================ */
+
+function makeEn2Vi(v, vocab) {
+  const others = vocab.filter(x => x.word !== v.word && x.meaning);
+  if (others.length < 3 || !v.meaning) return null;
+  const distractors = shuffle(others).slice(0, 3).map(x => x.meaning);
+  return {
+    type: 'en2vi',
+    word: v.word,
+    question: `Từ "<strong>${escapeHtml(v.word)}</strong>" có nghĩa là gì?`,
+    options: shuffle([v.meaning, ...distractors]),
+    correct: v.meaning,
+    explanation: `<strong>${escapeHtml(v.word)}</strong> (${escapeHtml(v.pos || '')}) ${escapeHtml(v.ipa || '')} = ${escapeHtml(v.meaning)}`
+  };
+}
+
+function makeVi2En(v, vocab) {
+  const others = vocab.filter(x => x.word !== v.word && x.word);
+  if (others.length < 3 || !v.meaning) return null;
+  const distractors = shuffle(others).slice(0, 3).map(x => x.word);
+  return {
+    type: 'vi2en',
+    word: v.word,
+    question: `Từ tiếng Anh nào có nghĩa "<strong>${escapeHtml(v.meaning)}</strong>"?`,
+    options: shuffle([v.word, ...distractors]),
+    correct: v.word,
+    explanation: `<strong>${escapeHtml(v.word)}</strong> (${escapeHtml(v.pos || '')}) ${escapeHtml(v.ipa || '')} = ${escapeHtml(v.meaning)}`
+  };
+}
+
+function makeIpa(v, vocab) {
+  if (!v.ipa) return null;
+  const others = vocab.filter(x => x.word !== v.word && x.ipa);
+  if (others.length < 3) return null;
+  const distractors = shuffle(others).slice(0, 3).map(x => x.ipa);
+  return {
+    type: 'ipa',
+    word: v.word,
+    question: `Cách phát âm (IPA) của "<strong>${escapeHtml(v.word)}</strong>" là gì?`,
+    options: shuffle([v.ipa, ...distractors]),
+    correct: v.ipa,
+    explanation: `<strong>${escapeHtml(v.word)}</strong> = ${escapeHtml(v.ipa)}`
+  };
+}
+
+function makeFill(v, vocab) {
+  if (!v.example || !v.word) return null;
+  const re = new RegExp('\\b' + escapeRegex(v.word) + '\\w*', 'i');
+  if (!re.test(v.example)) return null;
+  const blanked = v.example.replace(re, '_____');
+  const others = vocab.filter(x => x.word !== v.word && x.word);
+  if (others.length < 3) return null;
+  const distractors = shuffle(others).slice(0, 3).map(x => x.word);
+  return {
+    type: 'fill',
+    word: v.word,
+    question: `Điền vào chỗ trống:<em>"${escapeHtml(blanked)}"</em><small>(${escapeHtml(v.pos || '')} — ${escapeHtml(v.meaning || '')})</small>`,
+    options: shuffle([v.word, ...distractors]),
+    correct: v.word,
+    explanation: `Đáp án: <strong>${escapeHtml(v.word)}</strong>. Câu hoàn chỉnh: "${escapeHtml(v.example)}"`
+  };
+}
+
+function makeChooseWord(v, vocab) {
+  const others = vocab.filter(x => x.word !== v.word && x.example);
+  if (others.length < 3 || !v.example) return null;
+  const distractors = shuffle(others).slice(0, 3).map(x => x.example);
+  return {
+    type: 'chooseWord',
+    word: v.word,
+    question: `Câu ví dụ nào dùng đúng từ "<strong>${escapeHtml(v.word)}</strong>"?`,
+    options: shuffle([v.example, ...distractors]),
+    correct: v.example,
+    explanation: `"${escapeHtml(v.example)}" là câu chứa từ <strong>${escapeHtml(v.word)}</strong> (${escapeHtml(v.meaning || '')}).`
+  };
+}
+
+function makeContext(v, vocab) {
+  if (!v.example || !v.meaning) return null;
+  const others = vocab.filter(x => x.word !== v.word && x.meaning);
+  if (others.length < 3) return null;
+  const distractors = shuffle(others).slice(0, 3).map(x => x.meaning);
+  // Bold từ trong câu
+  const re = new RegExp('\\b(' + escapeRegex(v.word) + '\\w*)\\b', 'i');
+  const highlighted = v.example.replace(re, '<strong>$1</strong>');
+  return {
+    type: 'context',
+    word: v.word,
+    question: `Đọc câu sau và cho biết từ được in đậm có nghĩa là gì:<em>"${highlighted}"</em>`,
+    options: shuffle([v.meaning, ...distractors]),
+    correct: v.meaning,
+    explanation: `Trong ngữ cảnh này, <strong>${escapeHtml(v.word)}</strong> = ${escapeHtml(v.meaning)}.`
+  };
+}
+
+function buildPracticeQuestions() {
+  const vocab = lessonData.vocabulary;
+  if (vocab.length < 4) return [];
+
+  const makers = [makeEn2Vi, makeVi2En, makeIpa, makeFill, makeChooseWord, makeContext];
+  const questions = [];
+  const seen = new Set();
+
+  vocab.forEach((v, i) => {
+    // Cycle qua các loại câu hỏi, đảm bảo đa dạng
+    const order = shuffle([...Array(makers.length).keys()]);
+    for (const mi of order) {
+      const q = makers[mi](v, vocab);
+      if (q) {
+        const key = q.type + '|' + q.word + '|' + q.correct;
+        if (!seen.has(key)) {
+          seen.add(key);
+          questions.push(q);
+          break;
+        }
+      }
+    }
+  });
+
+  return shuffle(questions);
+}
+
+/* ================================================================
+   PRACTICE — Rendering & Logic
+   ================================================================ */
+
+let practiceState = {
+  questions: [],
+  index: 0,
+  score: 0,
+  answered: false
+};
+
+function renderPracticeLanding() {
+  document.getElementById('practiceStartCard').classList.remove('hidden');
+  document.getElementById('practiceArea').classList.add('hidden');
+  document.getElementById('practiceDone').classList.add('hidden');
+}
+
+document.getElementById('practiceStartBtn').addEventListener('click', () => {
+  startPractice();
+});
+
+document.getElementById('practiceRetryBtn').addEventListener('click', () => {
+  startPractice();
+});
+
+document.getElementById('practiceRestartBtn').addEventListener('click', () => {
+  startPractice();
+});
+
+function startPractice() {
+  const qs = buildPracticeQuestions();
+  if (!qs.length) {
+    alert('Cần ít nhất 4 từ vựng để tạo bài tập. Vui lòng thêm dữ liệu.');
+    return;
+  }
+  practiceState = { questions: qs, index: 0, score: 0, answered: false };
+
+  document.getElementById('practiceStartCard').classList.add('hidden');
+  document.getElementById('practiceDone').classList.add('hidden');
+  document.getElementById('practiceArea').classList.remove('hidden');
+
+  renderPracticeQuestion();
+}
+
+function renderPracticeQuestion() {
+  const { questions, index } = practiceState;
+  const q = questions[index];
+
+  document.getElementById('practiceCounter').textContent = `Câu ${index + 1} / ${questions.length}`;
+  document.getElementById('practiceScoreLive').textContent = `Điểm: ${practiceState.score}`;
+  document.getElementById('practiceProgressFill').style.width =
+    ((index / questions.length) * 100) + '%';
+
+  document.getElementById('practiceQuestion').innerHTML = q.question;
+
+  const optionsEl = document.getElementById('practiceOptions');
+  optionsEl.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i] || i + 1}</span><span>${escapeHtml(opt)}</span>`;
+    btn.addEventListener('click', () => handlePracticeAnswer(btn, opt, q));
+    optionsEl.appendChild(btn);
+  });
+
+  const fb = document.getElementById('practiceFeedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+
+  document.getElementById('practiceNextBtn').classList.add('hidden');
+  practiceState.answered = false;
+}
+
+function handlePracticeAnswer(btn, chosen, q) {
+  if (practiceState.answered) return;
+  practiceState.answered = true;
+
+  const buttons = document.querySelectorAll('#practiceOptions .option-btn');
+  const fb = document.getElementById('practiceFeedback');
+  const isCorrect = chosen === q.correct;
+
+  buttons.forEach(b => {
+    b.disabled = true;
+    const text = b.querySelector('span:last-child').textContent;
+    if (text === q.correct) b.classList.add('correct');
+    if (text === chosen && !isCorrect) b.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    practiceState.score++;
+    state.practiceScore++;
+    state.correctCount[q.word] = (state.correctCount[q.word] || 0) + 1;
+    fb.className = 'feedback correct show';
+    fb.innerHTML = `✅ <strong>Chính xác!</strong><br>${q.explanation}`;
+  } else {
+    fb.className = 'feedback wrong show';
+    fb.innerHTML = `❌ <strong>Sai rồi.</strong> Đáp án đúng là: <strong>${escapeHtml(q.correct)}</strong><br>${q.explanation}`;
+
+    // Lưu câu sai để ôn tập
+    const exists = state.incorrect.some(x =>
+      x.word === q.word && x.type === q.type && x.correct === q.correct
+    );
+    if (!exists) {
+      state.incorrect.push({
+        type: q.type,
+        word: q.word,
+        question: q.question,
+        options: q.options,
+        correct: q.correct,
+        explanation: q.explanation
+      });
+    }
+  }
+
+  state.practiceTotal++;
+  document.getElementById('practiceScoreLive').textContent = `Điểm: ${practiceState.score}`;
+  document.getElementById('practiceNextBtn').classList.remove('hidden');
+  saveState();
+}
+
+document.getElementById('practiceNextBtn').addEventListener('click', () => {
+  practiceState.index++;
+  if (practiceState.index >= practiceState.questions.length) {
+    finishPractice();
+  } else {
+    renderPracticeQuestion();
+  }
+});
+
+function finishPractice() {
+  document.getElementById('practiceArea').classList.add('hidden');
+  document.getElementById('practiceDone').classList.remove('hidden');
+  document.getElementById('practiceDoneText').textContent =
+    `Bạn đã trả lời đúng ${practiceState.score} / ${practiceState.questions.length} câu.`;
+
+  if (!state.completed.practice) {
+    state.completed.practice = true;
+    saveState();
+  }
+}
+
+/* ================================================================
+   LISTENING
+   ================================================================ */
+
+function renderListening() {
+  const vocab = lessonData.vocabulary;
+  if (!vocab.length) return;
+
+  let idx = state.currentListenIndex || 0;
+  if (idx < 0) idx = 0;
+  if (idx >= vocab.length) idx = vocab.length - 1;
+  state.currentListenIndex = idx;
+
+  const v = vocab[idx];
+
+  document.getElementById('listenWord').textContent = v.word;
+  document.getElementById('listenIpa').textContent = v.ipa || '';
+  document.getElementById('listenExample').textContent = v.example || '—';
+  document.getElementById('listenExampleMeaning').textContent = v.exampleMeaning || '';
+
+  document.getElementById('listenCounter').textContent = `${idx + 1} / ${vocab.length}`;
+  document.getElementById('listenPrev').disabled = idx === 0;
+  document.getElementById('listenNext').disabled = idx === vocab.length - 1;
+
+  if (idx === vocab.length - 1 && !state.completed.listening) {
+    state.completed.listening = true;
+    saveState();
+  }
+}
+
+document.getElementById('listenPlay').addEventListener('click', () => {
+  const v = lessonData.vocabulary[state.currentListenIndex];
+  if (v) speak(v.word, 1);
+});
+
+document.getElementById('listenSlow').addEventListener('click', () => {
+  const v = lessonData.vocabulary[state.currentListenIndex];
+  if (v) speak(v.word, 0.55);
+});
+
+document.getElementById('listenReplay').addEventListener('click', () => {
+  const v = lessonData.vocabulary[state.currentListenIndex];
+  if (v) speak(v.word, 1);
+});
+
+document.getElementById('listenSentenceBtn').addEventListener('click', () => {
+  const v = lessonData.vocabulary[state.currentListenIndex];
+  if (v && v.example) speak(v.example, 0.95);
+});
+
+document.getElementById('listenPrev').addEventListener('click', () => {
+  if (state.currentListenIndex > 0) {
+    state.currentListenIndex--;
+    saveState();
+    renderListening();
+  }
+});
+
+document.getElementById('listenNext').addEventListener('click', () => {
+  if (state.currentListenIndex < lessonData.vocabulary.length - 1) {
+    state.currentListenIndex++;
+    saveState();
+    renderListening();
+  }
+});
+
+/* ================================================================
+   REVIEW
+   ================================================================ */
+
+let reviewState = {
+  questions: [],
+  index: 0,
+  score: 0,
+  answered: false
+};
+
+function renderReviewLanding() {
+  const hasIncorrect = state.incorrect.length > 0;
+  document.getElementById('reviewEmpty').classList.toggle('hidden', hasIncorrect);
+  document.getElementById('reviewContent').classList.toggle('hidden', !hasIncorrect);
+  document.getElementById('reviewDone').classList.add('hidden');
+  // Hiện lại nút bắt đầu khi vào tab
+  const startBtn = document.getElementById('reviewStartBtn');
+  if (startBtn) startBtn.classList.remove('hidden');
+}
+
+document.getElementById('reviewClearBtn').addEventListener('click', () => {
+  if (state.incorrect.length && confirm('Xoá toàn bộ danh sách từ cần ôn?')) {
+    state.incorrect = [];
+    saveState();
+    renderReviewLanding();
+  }
+});
+
+document.getElementById('reviewRetryBtn').addEventListener('click', () => {
+  startReview();
+});
+
+// Thêm nút bắt đầu ôn tập nếu chưa có
+(function ensureReviewStartBtn() {
+  const content = document.getElementById('reviewContent');
+  if (!document.getElementById('reviewStartBtn')) {
+    const btn = document.createElement('button');
+    btn.id = 'reviewStartBtn';
+    btn.className = 'btn btn-primary btn-block';
+    btn.style.marginBottom = '16px';
+    btn.textContent = '🔁 Bắt đầu ôn tập';
+    content.insertBefore(btn, content.firstChild);
+    btn.addEventListener('click', () => startReview());
+  }
+})();
+
+function startReview() {
+  if (!state.incorrect.length) return;
+  reviewState = {
+    questions: shuffle([...state.incorrect]),
+    index: 0,
+    score: 0,
+    answered: false
+  };
+  document.getElementById('reviewEmpty').classList.add('hidden');
+  document.getElementById('reviewContent').classList.remove('hidden');
+  document.getElementById('reviewDone').classList.add('hidden');
+  document.getElementById('reviewStartBtn').classList.add('hidden');
+  renderReviewQuestion();
+}
+
+function renderReviewQuestion() {
+  const { questions, index } = reviewState;
+  const q = questions[index];
+
+  document.getElementById('reviewCounter').textContent = `Câu ${index + 1} / ${questions.length}`;
+  document.getElementById('reviewScoreLive').textContent = `Điểm: ${reviewState.score}`;
+  document.getElementById('reviewProgressFill').style.width =
+    ((index / questions.length) * 100) + '%';
+
+  document.getElementById('reviewQuestion').innerHTML = q.question;
+
+  const optionsEl = document.getElementById('reviewOptions');
+  optionsEl.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i] || i + 1}</span><span>${escapeHtml(opt)}</span>`;
+    btn.addEventListener('click', () => handleReviewAnswer(btn, opt, q));
+    optionsEl.appendChild(btn);
+  });
+
+  const fb = document.getElementById('reviewFeedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+
+  document.getElementById('reviewNextBtn').classList.add('hidden');
+  reviewState.answered = false;
+}
+
+function handleReviewAnswer(btn, chosen, q) {
+  if (reviewState.answered) return;
+  reviewState.answered = true;
+
+  const buttons = document.querySelectorAll('#reviewOptions .option-btn');
+  const fb = document.getElementById('reviewFeedback');
+  const isCorrect = chosen === q.correct;
+
+  buttons.forEach(b => {
+    b.disabled = true;
+    const text = b.querySelector('span:last-child').textContent;
+    if (text === q.correct) b.classList.add('correct');
+    if (text === chosen && !isCorrect) b.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    reviewState.score++;
+    fb.className = 'feedback correct show';
+    fb.innerHTML = `✅ <strong>Chính xác!</strong><br>${q.explanation}`;
+
+    // Xoá khỏi danh sách sai
+    state.incorrect = state.incorrect.filter(x =>
+      !(x.word === q.word && x.type === q.type && x.correct === q.correct)
+    );
+    // Cộng điểm thành thạo
+    state.correctCount[q.word] = (state.correctCount[q.word] || 0) + 1;
+  } else {
+    fb.className = 'feedback wrong show';
+    fb.innerHTML = `❌ <strong>Chưa đúng.</strong> Đáp án: <strong>${escapeHtml(q.correct)}</strong><br>${q.explanation}`;
+  }
+
+  document.getElementById('reviewNextBtn').classList.remove('hidden');
+  saveState();
+}
+
+document.getElementById('reviewNextBtn').addEventListener('click', () => {
+  reviewState.index++;
+  if (reviewState.index >= reviewState.questions.length) {
+    finishReview();
+  } else {
+    renderReviewQuestion();
+  }
+});
+
+function finishReview() {
+  document.getElementById('reviewContent').classList.add('hidden');
+  document.getElementById('reviewDone').classList.remove('hidden');
+  document.getElementById('reviewDoneText').textContent =
+    `Bạn đã trả lời đúng ${reviewState.score} / ${reviewState.questions.length} câu.`;
+
+  if (!state.completed.review) {
+    state.completed.review = true;
+    saveState();
+  }
+}
+
+/* ================================================================
+   PROGRESS
+   ================================================================ */
+
+function renderProgress() {
+  const total = lessonData.vocabulary.length;
+  const learned = Object.keys(state.learned).length;
+  const mastered = countMastered();
+  const wrong = state.incorrect.length;
+
+  document.getElementById('pgTotal').textContent = total;
+  document.getElementById('pgLearned').textContent = learned;
+  document.getElementById('pgMastered').textContent = mastered;
+  document.getElementById('pgScore').textContent = `${state.practiceScore} / ${state.practiceTotal}`;
+  document.getElementById('pgWrong').textContent = wrong;
+  document.getElementById('pgLast').textContent = formatDate(state.lastStudy);
+
+  const sections = [
+    { key: 'vocabulary', label: '📖 Vocabulary' },
+    { key: 'flashcards', label: '🃏 Flashcards' },
+    { key: 'practice', label: '✏️ Practice' },
+    { key: 'listening', label: '🎧 Listening' },
+    { key: 'review', label: '🔁 Review' }
+  ];
+  const el = document.getElementById('pgSections');
+  el.innerHTML = sections.map(s => {
+    const done = state.completed[s.key];
+    return `<span class="completed-section ${done ? '' : 'pending'}">
+      ${done ? '✓' : '○'} ${s.label}
+    </span>`;
+  }).join('');
+}
+
+document.getElementById('pgContinueBtn').addEventListener('click', () => {
+  showTab('vocabulary');
+});
+
+document.getElementById('pgResetBtn').addEventListener('click', () => {
+  if (confirm('Bạn có chắc muốn xoá toàn bộ tiến trình học? Hành động này không thể hoàn tác.')) {
+    state = { ...defaultState };
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    saveState();
+    renderProgress();
+    renderHome();
+    alert('Đã reset tiến trình học.');
+  }
+});
+
+/* ================================================================
+   INIT
+   ================================================================ */
+
+function init() {
+  // Set tiêu đề trang
+  document.title = lessonData.title || 'English Vocabulary';
+
+  // Render tab mặc định
+  renderHome();
+
+  // Nếu có tiến trình cũ, hiển thị "Continue"
+  const total = lessonData.vocabulary.length;
+  const learned = Object.keys(state.learned).length;
+  if (learned > 0 && learned < total) {
+    document.getElementById('startBtn').textContent = '▶️ Tiếp tục học';
+  } else if (learned >= total && total > 0) {
+    document.getElementById('startBtn').textContent = '🔁 Ôn tập lại';
+  }
+
+  // Cập nhật lastStudy ban đầu
+  if (!state.lastStudy) {
+    state.lastStudy = Date.now();
+    saveState();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
